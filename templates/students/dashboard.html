@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Dashboard</title>
+    <link rel="stylesheet" href="/static/dashStyle.css">
+</head>
+<body>
+    <header>
+        <nav>
+            <div class="logo">
+                <h1>Student Dashboard</h1>
+            </div>
+            <form action="{{ url_for('logout') }}" method="post">
+                <button type="submit" class="logout-btn">Logout</button>
+            </form>
+        </nav>
+    </header>
+    <main>
+
+        <section class="user-info">
+            <h2>Welcome, {{ name }}</h2>
+            <p>Your email: {{ email }}</p>
+        </section>
+        <section class="opportunities">
+            <h2>Opportunities Available:</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Title</th>
+                        <th>Department</th>
+                        <th>Description</th>
+                        <th>Salary</th>
+                        <th>Remote</th>
+                        <th>Duration</th>
+                        <th>Field</th>
+                        <!-- <th>Job Description</th> -->
+                        <!-- <th>Start Date</th> -->
+                        <!-- <th>End Date</th> -->
+                        <th>Application Deadline</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for opportunity in opportunities %}
+                    <tr>
+                        <td>{{ opportunity[0] }}</td>
+                        <td>{{ opportunity[1] }}</td>
+                        <td>{{ opportunity[7] }}</td>
+                        <td>{{ opportunity[3] }}</td>
+                        <td>{{ opportunity[4] }}</td>
+                        <td>{{ "Yes" if opportunity[5] else "No" }}</td>
+                        <td>{{ opportunity[6] }}</td>
+                        <td>{{ opportunity[8] }}</td>
+                        <!-- <td>{{ opportunity[9] }}</td> -->
+                        <!-- <td>{{ opportunity[10] }}</td> -->
+                        <!-- <td>{{ opportunity[11] }}</td> -->
+                        <td>{{ opportunity[10] }}</td>
+                        <td>
+                            <form action="{{ url_for('apply') }}" method="post">
+                                <input type="hidden" name="opportunity_id" value="{{ opportunity[0] }}">
+                                <button type="submit">Apply</button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </section>
+    </main>
+</body>
+</html>
