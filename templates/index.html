@@ -1,20 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
 
- <!DOCTYPE html>
- <html lang="en">
- <head>
-     <meta charset="UTF-8">
-     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-     <title>Google Login</title>
-     <link rel="stylesheet" href="/static/style.css">
-     <link rel="preconnect" href="https://fonts.googleapis.com">
-     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet">
- </head>
- <body>
-     <div class="container">
-         <h1>Welcome to Google Login!</h1>
-         <p>Please log in with your Google account</p>
-         <a href="{{ url_for('google') }}" class="google-login-btn button btn">Login with Google</a>
-     </div>
- </body>
- </html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Google Login</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <div class="container">
+        <h1>Welcome to Placement Portal!</h1>
+        <p>Please log in with your Google account</p>
+        <a href="{{ url_for('student') }}" class="google-login-btn button btn">Login as Student</a>
+        <br>
+        <a href="{{ url_for('recruiter') }}" class="google-login-btn button btn">Login as Recuiter</a>
+    </div>
+</body>
+
+</html>

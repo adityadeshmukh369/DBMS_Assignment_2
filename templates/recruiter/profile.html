@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Create Profile</title>
+    <link rel="stylesheet" href="/static/create_profile.css">
+</head>
+<body>
+    <h1>Create Profile</h1>
+    <form method="POST" action="/create_profile_recruiter" multipart/form-data">
+        <label for="firstName">First Name:</label>
+        <input type="text" id="firstName" name="firstName" required><br><br>
+
+        <label for="middleName">Middle Name:</label>
+        <input type="text" id="middleName" name="middleName"><br><br>
+
+        <label for="lastName">Last Name:</label>
+        <input type="text" id="lastName" name="lastName" required><br><br>
+
+        <label for="designation">Designation:</label>
+        <input type="text" id="department" name="designation" required><br><br>
+
+        <label for="comapanyName">Company Name:</label>
+        <input type="text" id="comapanyName" name="comapanyName" required><br><br>
+        
+
+        <label for="contactNumber">Contact Number:</label>
+        <input type="tel" id="contactNumber" name="contactNumber"><br><br>
+
+        <label for="interviewer">Are you an interviewer?</label>
+        <select id="interviewer" name="interviewer">
+        <option value="">Select</option>
+        <option value="yes">Yes</option>
+        <option value="no">No</option>
+        </select><br><br>
+
+        <input type="submit" value="Create Profile">
+    </form>
+</body>
+</html>
