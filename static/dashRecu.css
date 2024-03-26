@@ -156,24 +156,10 @@ a:hover {
     color: rgba(255, 255, 255, 0.7);
     text-decoration: none;
     border-radius: 4px;
+    transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 .button_custom:hover {
-    background-color: rgba(255, 255, 255, 0.2);
-    color: #ffffff;
-}
-
-.button_form {
-    background-color: #504B51;
-    color: rgba(255, 255, 255, 0.7);
-    font-weight: 300;
-    border: 0px;
-    padding: 0.5rem 1rem;
-    text-decoration: none;
-    border-radius: 4px;
-}
-
-.button_form:hover {
     background-color: rgba(255, 255, 255, 0.2);
     color: #ffffff;
 }
