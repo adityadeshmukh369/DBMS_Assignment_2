@@ -1,1 +1,1 @@
-recruiter_profile
+create_profile_recruiter

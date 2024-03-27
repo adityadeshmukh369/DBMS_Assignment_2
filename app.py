@@ -242,17 +242,39 @@ def edit_profile():
 
 # =========================================================
 
+@app.route('/edit_profile_recruiter', methods=['GET', 'POST'])
+def edit_profile_recruiter():
+    if 'email' not in session:
+        return redirect(url_for('index'))
+
+    email = session.get('email')
+    cur = mysql.connection.cursor()
+
+    # Fetch the user profile data from the database
+    cur.execute("SELECT * FROM Person_of_Contact WHERE Poc_Email_Id = %s", (email,))
+    user_profile = cur.fetchone()
+    cur.close()
+    # Render the edit profile form
+    return render_template('recruiter/create_profile.html',title='Edit Profile', user_profile=user_profile, footer="Update Profile")
 
 
-@app.route('/dashboard_recruiter')
+@app.route('/dashboard_recruiter',methods=['GET'])
 def dashboard_recruiter():
     if 'email' not in session:
         return redirect(url_for('index'))
 
     email = session.get('email')
     name = session.get('name')
-    opportunities = get_recruiter_opportunities(email)
+    
     return render_template('recruiter/dashboard.html', email=email, name=name)
+
+@app.route('/created_opportunity',methods=['GET'])
+def created_opportunity():
+    if 'email' not in session:
+        return redirect(url_for('index'))
+    email = session.get('email')
+    opportunities = get_recruiter_opportunities(email)
+    return render_template('recruiter/opportunities.html', opportunities=opportunities)
 
 
 @app.route('/recruiter_profile',methods=['GET'])
@@ -293,6 +315,25 @@ def recruiter():
     redirect_uri = url_for('google_auth_recruiter', _external=True)
     return oauth.google.authorize_redirect(redirect_uri)
 
+@app.route('/google/auth/recruiter/')
+def google_auth_recruiter():
+    token = oauth.google.authorize_access_token()
+    user = oauth.google.parse_id_token(token, nonce=None)
+    email = user.get('email')
+    name = user.get('name', 'Unknown')
+    cur = mysql.connection.cursor()
+    cur.execute("SELECT * FROM Person_of_Contact WHERE Poc_Email_Id = %s", (email,))
+    user_profile = cur.fetchone()
+    print(email)
+    if not user_profile:
+        return render_template('index.html')
+    cur.close()
+    opportunities = get_recruiter_opportunities(email)
+    # print(opportunities)
+    session['email'] = email
+    session['name'] = name
+    return render_template('recruiter/dashboard.html', email=email, name=name, opportunities=opportunities)
+
 
 def get_recruiter_opportunities(email):
     cur = mysql.connection.cursor()
@@ -301,43 +342,48 @@ def get_recruiter_opportunities(email):
     cur.close()
     return opportunities
 
-@app.route('/google/auth/recruiter/')
-def google_auth_recruiter():
-    token = oauth.google.authorize_access_token()
-    user = oauth.google.parse_id_token(token, nonce=None)
-    email = user.get('email')
-    name = user.get('name', 'Unknown')
-
-
-    opportunities = get_recruiter_opportunities(email)
-    print(opportunities)
-    session['email'] = email
-    session['name'] = name
-    return render_template('recruiter/dashboard.html', email=email, name=name, opportunities=opportunities)
-
-@app.route('/create_profile_recruiter',methods=['GET', 'POST'])
+@app.route('/create_profile_recruiter', methods=['GET', 'POST'])
 def create_profile_recruiter():
     if 'email' not in session:
         return redirect(url_for('index'))
 
+    email = session.get('email')
+
     if request.method == 'POST':
-        firstName = request.form['firstName']
-        middleName = request.form['middleName']
-        lastName = request.form['lastName']
-        designation = request.form['designation']
-        comapanyName = request.form['comapanyName']
-        interviewer = request.form['interviewer']
+        firstName = request.form.get('firstName')
+        middleName = request.form.get('middleName')
+        lastName = request.form.get('lastName')
+        designation = request.form.get('designation')
+        companyName = request.form.get('companyName')
+        interviewer = request.form.get('interviewer')
         contactNumber = request.form.get('contactNumber')
+
         cur = mysql.connection.cursor()
-        query = "INSERT INTO Person_of_Contact (Poc_Email_Id, Contact_no, Employee_First_Name, Employee_Middle_Name, Employee_Last_Name, Employee_Designation,Company_Name, Interviewer) VALUES (%s,%s, %s, %s, %s, %s, %s, %s)"
-        values = (session['email'],contactNumber, firstName, middleName, lastName, designation, comapanyName, interviewer)
-        cur.execute(query, values)
-        mysql.connection.commit()
+
+        # Check if the user already exists
+        cur.execute("SELECT Poc_Email_Id FROM Person_of_Contact WHERE Poc_Email_Id = %s", (email,))
+        existing_user = cur.fetchone()
+
+        if existing_user:
+            query = "UPDATE Person_of_Contact SET Employee_First_Name = %s, Employee_Middle_Name = %s, Employee_Last_Name = %s, Employee_Designation = %s, Company_Name = %s, Interviewer = %s, Contact_no = %s WHERE Poc_Email_Id = %s"
+            values = (firstName, middleName, lastName, designation, companyName, interviewer, contactNumber, email)
+            cur.execute(query, values)
+            mysql.connection.commit()
+            flash("Profile updated successfully!", "success")
+        else:
+            # query = "INSERT INTO Person_of_Contact (Poc_Email_Id, Contact_no, Employee_First_Name, Employee_Middle_Name, Employee_Last_Name, Employee_Designation, Company_Name, Interviewer) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)"
+            # values = (email, contactNumber, firstName, middleName, lastName, designation, companyName, interviewer)
+            # cur.execute(query, values)
+            # mysql.connection.commit()
+            # flash("Profile created successfully!", "success")
+            return redirect(url_for('index'))
+
         cur.close()
 
         return render_template('recruiter/dashboard.html')
-    
-    return render_template('recruiter/dashboard.html')
+
+    return render_template('recruiter/create_profile.html', title='Create Profile', user_profile={}, footer="Create Profile")
+
 
 @app.route('/create_opportunity')
 def create_opportunity():
@@ -352,8 +398,7 @@ def create_opportunity():
 
     if not poc_data:
         # Redirect to the profile creation page if the user doesn't have a profile
-        return render_template('recruiter/create_profile.html')
-
+        return render_template('recruiter/create_profile.html',title='Create Profile',user_profile={},footer="Create Profile")
     return render_template('recruiter/host_opportunity.html',email=email)
 
 @app.route('/save_opportunity', methods=['POST'])
@@ -393,6 +438,96 @@ def save_opportunity():
     cur.close()
 
     return render_template('recruiter/dashboard.html')
+
+# ========================================
+
+# CDS 
+
+@app.route('/cds/')
+def cds():
+    GOOGLE_CLIENT_ID = '191059943943-0mmksrcae41bh7ok1krrgvdk7thu7nlh.apps.googleusercontent.com'
+    GOOGLE_CLIENT_SECRET = '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'
+
+    CONF_URL = 'https://accounts.google.com/.well-known/openid-configuration'
+    oauth.register(
+        name='google',
+        client_id=GOOGLE_CLIENT_ID,
+        client_secret=GOOGLE_CLIENT_SECRET,
+        server_metadata_url=CONF_URL,
+        client_kwargs={
+            'scope': 'openid email profile'
+        }
+    )
+    redirect_uri = url_for('google_auth_cds', _external=True)
+    return oauth.google.authorize_redirect(redirect_uri)
+
+@app.route('/google/auth/cds/')
+def google_auth_cds():
+    token = oauth.google.authorize_access_token()
+    user = oauth.google.parse_id_token(token, nonce=None)
+    email = user.get('email')
+    name = user.get('name', 'Unknown')
+
+    # opportunities = get_recruiter_opportunities(email)
+    cur = mysql.connection.cursor()
+    cur.execute("SELECT * FROM CDS_USER WHERE Email = %s", (email,))
+    user_profile = cur.fetchone()
+    if not user_profile:
+        return render_template('index.html')
+    cur.close()
+    session['email'] = email
+    session['name'] = name
+    return render_template('cds/dashboard.html', email=email, name=name, opportunities=opportunities)
+
+
+@app.route('/add_poc')
+def add_poc():
+    if 'email' not in session:
+        return redirect(url_for('index'))
+    return render_template('cds/add_poc.html',title='Create Profile',user_profile={},footer="Add Profile")
+
+
+@app.route('/create_profile_poc',methods=['GET', 'POST'])
+def create_profile_poc():
+    if 'email' not in session:
+        return redirect(url_for('index'))
+
+
+    if request.method == 'POST':
+        firstName = request.form.get('firstName')
+        middleName = request.form.get('middleName')
+        lastName = request.form.get('lastName')
+        designation = request.form.get('designation')
+        companyName = request.form.get('companyName')
+        interviewer = request.form.get('interviewer')
+        contactNumber = request.form.get('contactNumber')
+        emailPOC = request.form.get('Email')
+        cur = mysql.connection.cursor()
+
+        # Check if the user already exists
+        cur.execute("SELECT Poc_Email_Id FROM Person_of_Contact WHERE Poc_Email_Id = %s", (emailPOC,))
+        existing_user = cur.fetchone()
+
+        if existing_user:
+            query = "UPDATE Person_of_Contact SET Employee_First_Name = %s, Employee_Middle_Name = %s, Employee_Last_Name = %s, Employee_Designation = %s, Company_Name = %s, Interviewer = %s, Contact_no = %s WHERE Poc_Email_Id = %s"
+            values = (firstName, middleName, lastName, designation, companyName, interviewer, contactNumber, emailPOC)
+            cur.execute(query, values)
+            mysql.connection.commit()
+            flash("Profile updated successfully!", "success")
+        else:
+            query = "INSERT INTO Person_of_Contact (Poc_Email_Id, Contact_no, Employee_First_Name, Employee_Middle_Name, Employee_Last_Name, Employee_Designation, Company_Name, Interviewer) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)"
+            values = (emailPOC, contactNumber, firstName, middleName, lastName, designation, companyName, interviewer)
+            cur.execute(query, values)
+            mysql.connection.commit()
+            flash("Profile created successfully!", "success")
+
+        cur.close()
+
+        return render_template('cds/dashboard.html')
+
+    return render_template('cds/add_poc.html', title='Create Profile', user_profile={}, footer="Create Profile")
+
+
 
 if __name__ == '__main__':
     app.run(debug=True)
