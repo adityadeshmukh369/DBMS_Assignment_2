@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Profile</title>
+    <link rel="stylesheet" href="/static/create_profile.css">
+</head>
+
+<body>
+    <div class="box">
+        <h2 class="h3box">Create Profile</h2>
+        <form action="{{ url_for('create_profile') }}" method="post" enctype="multipart/form-data">
+
+            <label for="firstName" class="label-box">First Name:</label>
+            <input type="text" id="firstName" name="firstName" class="input-box" required>
+
+            <label for="middleName" class="label-box">Middle Name:</label>
+            <input type="text" id="middleName" name="middleName" class="input-box">
+
+            <label for="lastName" class="label-box">Last Name:</label>
+            <input type="text" id="lastName" name="lastName" class="input-box" required>
+
+            <label for="designation" class="label-box">Designation:</label>
+            <input type="text" id="department" name="designation" class="input-box" required>
+
+            <label for="companyName" class="label-box">Company Name:</label>
+            <input type="text" id="companyName" name="companyName" class="input-box" required>
+
+            <label for="contactNumber" class="label-box">Contact Number:</label>
+            <input type="tel" id="contactNumber" name="contactNumber" class="input-box">
+
+            <label for="interviewer" class="label-box">Are you an interviewer?</label>
+            <select id="interviewer" name="interviewer" class="input-box">
+                <option value="">Select</option>
+                <option value="yes">Yes</option>
+                <option value="no">No</option>
+            </select><br><br>
+
+            <input type="submit" value="Create Profile" class="btn">
+        </form>
+    </div>
+</body>
+
+</html>

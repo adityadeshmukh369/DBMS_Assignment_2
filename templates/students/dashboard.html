@@ -22,48 +22,13 @@
         <div class="container">
             <div class="d-flex justify-content-between align-items-center mb-4">
                 <h1 class="welocme">Welcome, {{ name }}</h1>
-                <a class="button_custom" href="{{ url_for('logout') }}">Logout</a>
-            </div>
-            <h2 class="mb-4 title_custom"> Opportunities</h2>
-            <div class="table-responsive">
-                <table class="table table-striped custom-table">
-                    <thead>
-                        <tr>
-                            <th scope="col">ID</th>
-                            <th scope="col">Title</th>
-                            <th scope="col">Department</th>
-                            <th scope="col">Description</th>
-                            <th scope="col">Salary</th>
-                            <th scope="col">Remote</th>
-                            <th scope="col">CPI requirement</th>
-                            <th scope="col">Number of Position</th>
-                            <th scope="col">Application Deadline</th>
-                        </tr>
+                <div>
+                    <a class="button_custom" href="{{ url_for('student_profile') }}">Profile</a>
+                    <a class="button_custom" href="{{ url_for('logout') }}">Logout</a>
+                </div>
 
-                    </thead>
-                    <tbody>
-                        {% for opportunity in opportunities %}
-                        <tr>
-                            <td>{{ opportunity[0] }}</td>
-                            <td>{{ opportunity[1] }}</td>
-                            <td>{{ opportunity[7] }}</td>
-                            <td>{{ opportunity[3] }}</td>
-                            <td>{{ opportunity[11] }}</td>
-                            <td>{{ "Yes" if opportunity[5] else "No" }}</td>
-                            <td>{{ opportunity[4] }}</td>
-                            <td>{{ opportunity[2] }}</td>
-                            <td>{{ opportunity[10] }}</td>
-                            <td>
-                                <form action="{{ url_for('apply') }}" method="post">
-                                    <input type="hidden" name="opportunity_id" value="{{ opportunity[0] }}">
-                                    <button type="submit" class="button_form">Apply</button>
-                                </form>
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
             </div>
+            <a class="button_custom" href="{{ url_for('opportunities') }}">Opportunities</a>
         </div>
     </div>
     <script src="js/jquery-3.3.1.min.js"></script>

@@ -1,1 +1,1 @@
-opportunities
+recruiter_profile
