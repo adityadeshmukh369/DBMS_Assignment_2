@@ -70,7 +70,14 @@ def dashboard():
     email = session.get('email')
     name = session.get('name')
     opportunities = get_opportunities()
-    return render_template('students/dashboard.html', email=email, name=name, opportunities=opportunities)
+    return render_template('students/dashboard.html', email=email, name=name)
+
+
+@app.route('/opportunities')
+def opportunities():
+    opportunities = get_opportunities()
+    return render_template('students/opportunities.html', opportunities=opportunities)
+
 
 def get_opportunities():
     cur = mysql.connection.cursor()
@@ -102,7 +109,8 @@ def apply():
 
     if not user_profile:
         # Redirect to the profile creation page if the user doesn't have a profile
-        return redirect(url_for('create_profile'))
+        return render_template('students/create_profile.html',title='Create Profile',user_profile={},footer="Create Profile")
+
 
     opportunity_id = request.form.get('opportunity_id')
     return render_template('students/apply_form.html', opportunity_id=opportunity_id)
@@ -131,10 +139,32 @@ def apply_opportunity():
     return render_template('students/dashboard.html', email=email, name=user_name, opportunities=opportunities)
 
 
-@app.route('/create-profile', methods=['GET', 'POST'])
+@app.route('/student_profile',methods=['GET'])
+def student_profile():
+    if 'email' not in session:
+        return redirect(url_for('index'))
+
+    email = session.get('email')
+    cur = mysql.connection.cursor()
+
+    cur.execute("SELECT * FROM Student WHERE Student_Email_Id = %s", (email,))
+    user_profile = cur.fetchone()
+    cur.close()
+
+    if not user_profile:
+        # Redirect to the profile creation page if the user doesn't have a profile
+        return render_template('students/create_profile.html',title='Create Profile',user_profile={},footer="Create Profile")
+
+    return render_template('students/profile.html', email=email, user_profile=user_profile)
+
+
+
+@app.route('/create_profile', methods=['GET', 'POST'])
 def create_profile():
     if 'email' not in session:
         return redirect(url_for('index'))
+
+    email = session.get('email')
 
     if request.method == 'POST':
         # Get form data
@@ -147,7 +177,6 @@ def create_profile():
         minors = request.form.get('minors')
         contactNumber = request.form.get('contactNumber')
         activeBacklog = request.form.get('activeBacklog')
-        email = session.get('email')  # Get email from session
 
         # Validate email format
         if not email.endswith('@iitgn.ac.in'):
@@ -156,43 +185,94 @@ def create_profile():
 
         # Handle student image upload
         studentImage = request.files.get('studentImage')
+        studentImagePath = None
         if studentImage:
             studentImageFilename = secure_filename(studentImage.filename)
             studentImagePath = os.path.join(app.config['images_folder'], studentImageFilename)
-            # studentImage.save(studentImagePath)
 
-        # Handle resume upload
-        resume = request.files.get('resume')
-        if resume:
-            resumeFilename = secure_filename(resume.filename)
-            resumePath = os.path.join(app.config['resume_folder'], resumeFilename)
-            # resume.save(resumePath)
-
-        # Save the profile data to the database
         cur = mysql.connection.cursor()
-        cur.execute("SELECT MAX(Student_ID) FROM Student")
-        last_student_id = cur.fetchone()[0]
-        cur.close()
-        if last_student_id is None:
-            new_student_id = 1
+
+        # Check if the user already exists
+        cur.execute("SELECT Student_ID FROM Student WHERE Student_Email_Id = %s", (email,))
+        existing_user = cur.fetchone()
+
+        if existing_user:
+            # User already exists, update the profile
+            student_id = existing_user[0]
+            query = "UPDATE Student SET Student_First_Name = %s, Student_Middle_Name = %s, Student_Last_Name = %s, Active_Backlog = %s, Department = %s, Gender = %s, Year = %s, Student_Image = %s, Minors = %s, Contact_Number = %s WHERE Student_ID = %s"
+            values = (firstName, middleName, lastName, activeBacklog, department, gender, currentYear, studentImagePath, minors, contactNumber, student_id)
+            cur.execute(query, values)
+            mysql.connection.commit()
+            flash("Profile updated successfully!", "success")
         else:
-            new_student_id = last_student_id + 1    
-        
-        cur = mysql.connection.cursor()
-        query = "INSERT INTO Student (Student_ID,Student_First_Name, Student_Middle_Name, Student_Last_Name, Active_Backlog,Department, Gender, Year, Student_Image, Resume, Minors, Student_Email_Id, Contact_Number) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
-        values = (new_student_id, firstName, middleName, lastName, activeBacklog ,department, gender, currentYear, studentImagePath, resumePath, minors, email, contactNumber)
-        cur.execute(query, values)
-        mysql.connection.commit()
+            # New user, create a new profile
+            cur.execute("SELECT MAX(Student_ID) FROM Student")
+            last_student_id = cur.fetchone()[0]
+            new_student_id = last_student_id + 1 if last_student_id else 1
+            query = "INSERT INTO Student (Student_ID, Student_First_Name, Student_Middle_Name, Student_Last_Name, Active_Backlog, Department, Gender, Year, Student_Image, Minors, Student_Email_Id, Contact_Number) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
+            values = (new_student_id, firstName, middleName, lastName, activeBacklog, department, gender, currentYear, studentImagePath, minors, email, contactNumber)
+            cur.execute(query, values)
+            mysql.connection.commit()
+            flash("Profile created successfully!", "success")
+
         cur.close()
 
-        # Redirect to the dashboard after successful profile creation
-        flash("Profile created successfully!", "success")
+        # Redirect to the dashboard after successful profile creation/update
         return redirect(url_for('dashboard'))
 
-    # Render the profile creation form
-    return render_template('students/create_profile.html')
+    # Render the profile creation/edit form
+    user_profile = {}
+    return render_template('students/create_profile.html', title='Create Profile', user_profile=user_profile, footer="Create Profile")
+
+@app.route('/edit_profile', methods=['GET', 'POST'])
+def edit_profile():
+    if 'email' not in session:
+        return redirect(url_for('index'))
+
+    email = session.get('email')
+    cur = mysql.connection.cursor()
+
+    # Fetch the user profile data from the database
+    cur.execute("SELECT * FROM Student WHERE Student_Email_Id = %s", (email,))
+    user_profile = cur.fetchone()
+    cur.close()
+    # Render the edit profile form
+    return render_template('students/create_profile.html',title='Edit Profile', user_profile=user_profile, footer="Update Profile")
+
 
 # =========================================================
+
+
+
+@app.route('/dashboard_recruiter')
+def dashboard_recruiter():
+    if 'email' not in session:
+        return redirect(url_for('index'))
+
+    email = session.get('email')
+    name = session.get('name')
+    opportunities = get_recruiter_opportunities(email)
+    return render_template('recruiter/dashboard.html', email=email, name=name)
+
+
+@app.route('/recruiter_profile',methods=['GET'])
+def recruiter_profile():
+    if 'email' not in session:
+        return redirect(url_for('index'))
+
+    email = session.get('email')
+    cur = mysql.connection.cursor()
+
+    cur.execute("SELECT * FROM Person_of_Contact WHERE Poc_Email_Id = %s", (email,))
+    user_profile = cur.fetchone()
+    cur.close()
+
+    if not user_profile:
+        # Redirect to the profile creation page if the user doesn't have a profile
+        return render_template('recruiter/create_profile.html',title='Create Profile',user_profile={},footer="Create Profile")
+
+    return render_template('recruiter/profile.html', email=email, user_profile=user_profile)
+
 
 
 @app.route('/recruiter/')
@@ -272,7 +352,7 @@ def create_opportunity():
 
     if not poc_data:
         # Redirect to the profile creation page if the user doesn't have a profile
-        return render_template('recruiter/profile.html')
+        return render_template('recruiter/create_profile.html')
 
     return render_template('recruiter/host_opportunity.html',email=email)
 
