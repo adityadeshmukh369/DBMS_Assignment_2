@@ -10,35 +10,35 @@
 
 <body>
     <div class="box">
-        <h2 class="h3box">Create Profile</h2>
-        <form action="{{ url_for('create_profile') }}" method="post" enctype="multipart/form-data">
+        <h2 class="h3box">{{ title }}</h2>
+        <form action="{{ url_for('create_profile_recruiter') }}" method="post" enctype="multipart/form-data">
 
             <label for="firstName" class="label-box">First Name:</label>
-            <input type="text" id="firstName" name="firstName" class="input-box" required>
+            <input type="text" value="{{user_profile[2]}}" id="firstName" name="firstName" class="input-box" required>
 
             <label for="middleName" class="label-box">Middle Name:</label>
-            <input type="text" id="middleName" name="middleName" class="input-box">
+            <input type="text" value="{{user_profile[3]}}" id="middleName" name="middleName" class="input-box">
 
             <label for="lastName" class="label-box">Last Name:</label>
-            <input type="text" id="lastName" name="lastName" class="input-box" required>
+            <input type="text" value="{{user_profile[4]}}" id="lastName" name="lastName" class="input-box" required>
 
             <label for="designation" class="label-box">Designation:</label>
-            <input type="text" id="department" name="designation" class="input-box" required>
+            <input type="text" value="{{user_profile[5]}}" id="department" name="designation" class="input-box" required>
 
             <label for="companyName" class="label-box">Company Name:</label>
-            <input type="text" id="companyName" name="companyName" class="input-box" required>
+            <input type="text" value="{{user_profile[-1]}}" id="companyName" name="companyName" class="input-box" required>
 
             <label for="contactNumber" class="label-box">Contact Number:</label>
-            <input type="tel" id="contactNumber" name="contactNumber" class="input-box">
+            <input type="tel" value="{{user_profile[1]}}" id="contactNumber" name="contactNumber" class="input-box">
 
             <label for="interviewer" class="label-box">Are you an interviewer?</label>
             <select id="interviewer" name="interviewer" class="input-box">
                 <option value="">Select</option>
-                <option value="yes">Yes</option>
-                <option value="no">No</option>
-            </select><br><br>
+                <option value="Yes" {% if user_profile[-2] == 'Yes' %}selected{% endif %}>Yes</option>
+                <option value="No" {% if user_profile[-2] == 'No' %}selected{% endif %}>No</option>
+            </select><br>
 
-            <input type="submit" value="Create Profile" class="btn">
+            <input type="submit" value="{{footer}}" class="btn">
         </form>
     </div>
 </body>

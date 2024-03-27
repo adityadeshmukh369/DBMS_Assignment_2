@@ -16,12 +16,13 @@
 
 
             <label for="firstName">First Name</label>
-            <input type="text" value="{{user_profile[1]}}" name="firstName" id="firstName" placeholder="Enter Your First Name" class="input-box" required value="Aditya">
+            <input type="text" value="{{user_profile[1]}}" name="firstName" id="firstName" placeholder="Enter Your First Name" class="input-box" required>
+
             <label for="middleName">Middle Name</label>
-            <input type="text" value="{{user_profile[2]}}" "middleName" id="middleName" placeholder="Enter Your Middle Name" class="input-box" required>
+            <input type="text" value="{{user_profile[2]}}" name="middleName" id="middleName" placeholder="Enter Your Middle Name" class="input-box" required>
+
             <label for="lastName">Last Name</label>
             <input type="text" value="{{user_profile[3]}}" name="lastName" id="lastName" placeholder="Enter Your Last Name" class="input-box" required>
-
 
             <label for="branch">Department</label>
             <input type="text" value="{{user_profile[4]}}" name="department" id="branch" placeholder="Enter Your Department" class="input-box" required>
@@ -41,9 +42,9 @@
             <label for="gender">Gender:</label>
             <select id="gender" name="gender" class="input-box" required>
                 <option value="">Select Gender</option>
-                <option value="male" {% if user_profile[6] == 'Male' %}selected{% endif %}>Male</option>
-                <option value="female" {% if user_profile[6] == 'Female' %}selected{% endif %}>Female</option>
-                <option value="other" {% if user_profile[6] == 'Other' %}selected{% endif %}>Other</option>
+                <option value="Male" {% if user_profile[6] == 'Male' %}selected{% endif %}>Male</option>
+                <option value="Female" {% if user_profile[6] == 'Female' %}selected{% endif %}>Female</option>
+                <option value="Other" {% if user_profile[6] == 'Other' %}selected{% endif %}>Other</option>
             </select><br>
 
             <label for="studentImage">Student Image:</label>

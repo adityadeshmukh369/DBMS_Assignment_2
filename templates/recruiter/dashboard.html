@@ -27,35 +27,13 @@
                     <a class="button_custom" href="{{ url_for('recruiter_profile') }}">Profile</a>
                     <a class="button_custom" href="{{ url_for('logout') }}">Logout</a>
                 </div>
-
             </div>
-            <h2 class="mb-4 title_custom">Previously Hosted Opportunities</h2>
-            <div class="table-responsive">
-                <table class="table table-striped custom-table">
-                    <thead>
-                        <tr>
-                            <th scope="col">Title</th>
-                            <th scope="col">Positions</th>
-                            <th scope="col">Salary</th>
-                            <th scope="col">Deadline</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for opportunity in opportunities %}
-                        <tr>
-                            <td>{{ opportunity[1] }}</td>
-                            <td>{{ opportunity[2] }}</td>
-                            <td>{{ opportunity[11] }}</td>
-                            <td>{{ opportunity[10] }}</td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-            <h2 class="mb-4 title_custom">Host a New Opportunity</h2>
+            <a class="button_custom" href="{{ url_for('created_opportunity') }}">Hosted Opportunity</a><br><br>
             <a class="button_custom" href="{{ url_for('create_opportunity') }}">Host New Opportunity</a>
         </div>
+
     </div>
+
     <script src="js/jquery-3.3.1.min.js"></script>
     <script src="js/popper.min.js"></script>
     <script src="js/bootstrap.min.js"></script>
