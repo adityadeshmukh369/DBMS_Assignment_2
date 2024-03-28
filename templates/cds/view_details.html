@@ -1,0 +1,51 @@
+<!doctype html>
+
+<html lang="en">
+
+<head>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link href="https://fonts.googleapis.com/css?family=Roboto:300,400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="fonts/icomoon/style.css">
+    <link rel="stylesheet" href="css/owl.carousel.min.css">
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css"
+        integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+
+    <link rel="stylesheet" href="/static/profile.css">
+    <title>Student Profile</title>
+
+</head>
+
+<body>
+    <div class="content">
+        <div class="container">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1 class="welocme">Student Profile</h1>
+                <div>
+                    <a class="button_custom" href="{{ url_for('dashboard') }}">Dashboard</a>
+                    <a class="button_custom" href="{{ url_for('logout') }}">Logout</a>
+                </div>
+
+            </div>
+            <p>Fist name : {{user_profile[1]}}</p>
+            <p>Middle name : {{user_profile[2]}}</p>
+            <p>Last name : {{user_profile[3]}}</p>
+            <p>Department: {{user_profile[4]}}</p>
+            <p>Active Backlog : {{user_profile[5]}}</p>
+            <p>Gender : {{user_profile[6]}}</p>
+            <p>Current Year : {{user_profile[7]}}</p>
+            <p>Minor : {{user_profile[9]}}</p>
+            <p>Email : {{user_profile[10]}}</p>
+            <p>Contact Number : {{user_profile[11]}}</p>
+            <a href="{{ url_for('go_back') }}" class="button_custom">Go Back</a>
+        </div>
+    </div>
+    <script src="js/jquery-3.3.1.min.js"></script>
+    <script src="js/popper.min.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+    <script src="js/main.js"></script>
+</body>
+
+</html>
