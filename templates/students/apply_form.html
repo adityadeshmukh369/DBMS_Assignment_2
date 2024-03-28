@@ -14,20 +14,13 @@
         <h3>Applying for Opportunity - {{ opportunity_id }}</h3>
         <form action="{{ url_for('apply_opportunity') }}" method="post" enctype="multipart/form-data">
             <input type="hidden" name="opportunity_id" value="{{ opportunity_id }}">
+            <input type="hidden" name="student_id" value="{{ student_id }}">
+
             <label for="name">Name</label><br>
             <input type="text" name="name" id="name" placeholder="Enter Your Name" class="input-box" required>
-            <!-- <br><br> -->
-            <label for="branch">Departement</label><br>
-            <input type="text" name="branch" id="branch" placeholder="Enter Your Branch" class="input-box" required>
-            <!-- <br><br> -->
-            <label for="cpi">CPI</label><br>
-            <input type="text" name="cpi" id="cpi" placeholder="Enter Your CPI" class="input-box" required>
 
             <label for="resume">Upload Resume</label><br>
             <input type="file" name="resume" id="resume" class="input-box" required>
-
-
-
             <button type="submit" class="btn">Submit Application</button>
         </form>
     </div>

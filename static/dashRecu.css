@@ -62,6 +62,8 @@ h2 {
 .custom-table thead tr,
 .custom-table thead th {
     padding-bottom: 30px;
+    /* text-align: center;  */
+    vertical-align: middle; 
     border-top: none;
     border-bottom: none !important;
     color: #ffffff;
@@ -73,6 +75,8 @@ h2 {
 .custom-table tbody th,
 .custom-table tbody td {
     color: #ffffff;
+    /* text-align: center;  */
+    vertical-align: middle; 
     font-weight: 400;
     padding-bottom: 20px;
     padding-top: 20px;
