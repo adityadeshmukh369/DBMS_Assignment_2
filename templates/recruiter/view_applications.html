@@ -1,9 +1,6 @@
 <!doctype html>
-
 <html lang="en">
-
 <head>
-
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <link href="https://fonts.googleapis.com/css?family=Roboto:300,400&display=swap" rel="stylesheet">
@@ -12,49 +9,54 @@
 
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
 
-    <link rel="stylesheet" href="/static/dashRecu.css">
+    <link rel="stylesheet" href="/static/dashStyle.css">
     <title>Recruiter Dashboard</title>
-
 </head>
-
 <body>
     <div class="content">
         <div class="container">
             <div class="d-flex justify-content-between align-items-center mb-4">
-                <h1 class="welocme">Hosted Opportunities</h1>
+                <h1 class="welocme">Opportunities Status</h1>
                 <div>
                     <a class="button_custom" href="{{ url_for('dashboard_recruiter') }}">Dashboard</a>
                     <a class="button_custom" href="{{ url_for('logout') }}">Logout</a>
                 </div>
-
             </div>
-            {% if opportunities %}
+            {% if applications %}
             <div class="table-responsive">
                 <table class="table table-striped custom-table">
                     <thead>
                         <tr>
-                            <th scope="col">Title</th>
-                            <th scope="col">Positions</th>
-                            <th scope="col">Salary</th>
-                            <th scope="col">Deadline</th>
-                            <th scope="col">Applications</th>
+                            <th scope="col">Student Name</th>
+                            <th scope="col">Resume</th>
+                            <th scope="col">Status</th>
                         </tr>
                     </thead>
                     <tbody>
-                        {% for opportunity in opportunities %}
+                        {% for application in applications %}
                         <tr>
-                            <td>{{ opportunity[1] }}</td>
-                            <td>{{ opportunity[2] }}</td>
-                            <td>{{ opportunity[11] }}</td>
-                            <td>{{ opportunity[10] }}</td>
-                            <td><a class="button_custom" href="{{ url_for('view_applications', opp_id=opportunity[0]) }}">View Applications</a></td>
+                            <td>{{ application[-1] }}</td>
+                            <td>{{ application[2] }}</td>
+                            <!-- <td>{{ application[3] }}</td> -->
+                            <td>
+                                <form class"form_css" action="{{ url_for('update_status', student_id=application[0], opp_id=application[1]) }}" method="post">
+
+                                    <select name="status" class="input-custom" class="form-control">
+                                        <option value="Pending" {% if application[3] == 'Pending' %} selected {% endif %}>Pending</option>
+                                        <option value="Accepted" {% if application[3] == 'Accepted' %} selected {% endif %}>Accepted</option>
+                                        <option value="Rejected" {% if application[3] == 'Rejected' %} selected {% endif %}>Rejected</option>
+                                    </select>
+                                    <button type="submit" class="button_form">Update Status</button>
+                                </form>
+                            </td>
+                            
                         </tr>
                         {% endfor %}
                     </tbody>
                 </table>
             </div>
             {% else %}
-            <p>No opportunities hosted.</p>
+            <p>No one has applied for the opportunity at the moment.</p>
             {% endif %}
         </div>
     </div>
@@ -63,5 +65,5 @@
     <script src="js/bootstrap.min.js"></script>
     <script src="js/main.js"></script>
 </body>
-
+</html>
 </html>

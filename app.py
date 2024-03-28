@@ -53,8 +53,9 @@ def google_auth_student():
     user = oauth.google.parse_id_token(token, nonce=None)
     email = user.get('email')
     name = user.get('name', 'Unknown')
-
-
+    if not email.endswith('@iitgn.ac.in'):
+        flash("Invalid email format. Please use your @iitgn.ac.in email address.", "error")
+        return render_template('index.html')
     opportunities = get_opportunities()
     session['email'] = email
     session['name'] = name
@@ -111,33 +112,49 @@ def apply():
         # Redirect to the profile creation page if the user doesn't have a profile
         return render_template('students/create_profile.html',title='Create Profile',user_profile={},footer="Create Profile")
 
-
     opportunity_id = request.form.get('opportunity_id')
-    return render_template('students/apply_form.html', opportunity_id=opportunity_id)
+    return render_template('students/apply_form.html', opportunity_id=opportunity_id, email=email,student_id = user_profile[0])
 
 
 
 @app.route('/apply_opportunity', methods=['POST'])
 def apply_opportunity():
     opportunity_id = request.form.get('opportunity_id')
-    name = request.form.get('name')
-    branch = request.form.get('branch')
+    student_id = request.form.get('student_id')
     resume = request.files.get('resume')
 
-    # Save the resume file if needed
     if resume:
         resume_filename = f"{uuid.uuid4().hex}_{resume.filename}"
         # resume.save(os.path.join('uploads', resume_filename))
         # print(f"Resume saved: {resume_filename}")
 
-    # Display a success message
+    cur = mysql.connection.cursor()
+    query = "INSERT INTO Application (Student_ID, Status,Opp_ID, Resume_File) VALUES (%s, %s, %s, %s)"
+    values = (student_id,"Pending",opportunity_id, resume_filename)
+    cur.execute(query, values)
+    mysql.connection.commit()
     flash("Form submitted successfully!", "success")
     email = session.get('email')
     user_name = session.get('name')
-    messages = get_flashed_messages(with_categories=True)
     opportunities = get_opportunities()
     return render_template('students/dashboard.html', email=email, name=user_name, opportunities=opportunities)
 
+
+@app.route('/status_opp_student',methods=['GET'])
+def status_opp_student():
+    if 'email' not in session:
+        return redirect(url_for('index'))
+    email = session.get('email')
+    cur = mysql.connection.cursor()
+    students = cur.execute("SELECT * FROM Student WHERE Student_Email_Id = %s", (email,))
+    student_id = cur.fetchone()[0]
+    cur = mysql.connection.cursor()
+
+    cur.execute("SELECT A.*, O.Opp_Title FROM Application A JOIN Opportunity O ON A.Opp_ID = O.Opp_ID WHERE A.Student_ID = %s", (student_id,))
+    applications = cur.fetchall()
+    print(applications)
+    cur.close()
+    return render_template('students/opportunity_status.html',applications=applications)
 
 @app.route('/student_profile',methods=['GET'])
 def student_profile():
@@ -178,10 +195,6 @@ def create_profile():
         contactNumber = request.form.get('contactNumber')
         activeBacklog = request.form.get('activeBacklog')
 
-        # Validate email format
-        if not email.endswith('@iitgn.ac.in'):
-            flash("Invalid email format. Please use your @iitgn.ac.in email address.", "error")
-            return render_template('students/create_profile.html')
 
         # Handle student image upload
         studentImage = request.files.get('studentImage')
@@ -241,6 +254,8 @@ def edit_profile():
 
 
 # =========================================================
+# Recruiter
+
 
 @app.route('/edit_profile_recruiter', methods=['GET', 'POST'])
 def edit_profile_recruiter():
@@ -439,6 +454,54 @@ def save_opportunity():
 
     return render_template('recruiter/dashboard.html')
 
+
+@app.route('/view_applications')
+def view_applications():
+    if 'email' not in session:
+        return redirect(url_for('index'))
+    opp_id = request.args.get('opp_id')
+    email = session['email']
+    cur = mysql.connection.cursor()
+    cur.execute("SELECT A.*, CONCAT(S.Student_First_Name, ' ', S.Student_Last_Name) AS Student_Name FROM Application A JOIN Student S ON A.Student_ID = S.Student_ID WHERE A.Opp_ID = %s", (opp_id,))
+    applications = cur.fetchall()
+
+    return render_template('recruiter/view_applications.html', applications=applications)
+
+@app.route('/update_status/', methods=['GET','POST'])
+def update_status():
+    if 'email' not in session:
+        return redirect(url_for('index'))
+    
+
+    student_id = request.args.get('student_id')
+    opp_id = request.args.get('opp_id')
+    status = request.form.get('status')
+    cur = mysql.connection.cursor()
+    print(opp_id)
+    print(student_id)
+    cur.execute("UPDATE Application SET Status = %s WHERE Student_ID = %s AND Opp_ID = %s", (status, student_id, opp_id))
+    mysql.connection.commit()
+    cur.close()
+    return redirect(url_for('dashboard_recruiter'))
+
+
+# Test this also 
+# @app.route('/update_status/<int:student_id>/<int:opp_id>', methods=['POST'])
+# def update_status(student_id, opp_id):
+#     if 'email' not in session:
+#         return redirect(url_for('index'))
+    
+#     status = request.form['status']
+    
+#     cur = mysql.connection.cursor()
+#     cur.execute("UPDATE Application SET Status = %s WHERE Student_ID = %s AND Opp_ID = %s", (status, student_id, opp_id))
+#     mysql.connection.commit()
+#     cur.close()
+    
+#     return redirect(url_for('view_applications'))
+
+
+
 # ========================================
 
 # CDS 
@@ -528,6 +591,7 @@ def create_profile_poc():
     return render_template('cds/add_poc.html', title='Create Profile', user_profile={}, footer="Create Profile")
 
 
+# ================================================
 
 if __name__ == '__main__':
     app.run(debug=True)

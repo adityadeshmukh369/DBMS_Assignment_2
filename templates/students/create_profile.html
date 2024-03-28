@@ -45,7 +45,7 @@
                 <option value="Male" {% if user_profile[6] == 'Male' %}selected{% endif %}>Male</option>
                 <option value="Female" {% if user_profile[6] == 'Female' %}selected{% endif %}>Female</option>
                 <option value="Other" {% if user_profile[6] == 'Other' %}selected{% endif %}>Other</option>
-            </select><br>
+            </select>
 
             <label for="studentImage">Student Image:</label>
             <input type="file" value="{{user_profile[8]}}" id="studentImage" name="studentImage" class="input-box" accept="image/*">

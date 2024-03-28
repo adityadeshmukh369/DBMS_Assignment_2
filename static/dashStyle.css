@@ -177,3 +177,30 @@ a:hover {
     background-color: rgba(255, 255, 255, 0.2);
     color: #ffffff;
 }
+
+.form_css {
+    display: flex;
+    flex-direction: column;
+}
+
+.input-group {
+    margin-bottom: 10px;
+}
+
+.input-group label {
+    margin-bottom: 5px;
+}
+
+.input-custom {
+    /* Your custom styles for the select element */
+    width: 40%;
+    border: 1px solid #ccc;
+    background-color: #504B51;
+    color: rgba(255, 255, 255, 0.7);
+    font-weight: 300;
+    /* border: 0px; */
+    padding: 0.5rem 1rem;
+    text-decoration: none;
+    border-radius: 4px;
+}
+
