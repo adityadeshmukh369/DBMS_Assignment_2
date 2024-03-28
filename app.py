@@ -672,5 +672,53 @@ def edit_opportunity(opp_id):
     return render_template('recruiter/host_opportunity.html',email=email,opportunity=opportunity,title='Edit Opportunity',footer="Update Opportunity")
 
 
+# =============================================================
+@app.route('/student_Details')
+def student_Details():
+    details = get_student_Details()
+    return render_template('cds/student_details.html', details=details)
+
+def get_student_Details():
+    cur = mysql.connection.cursor()
+    cur.execute("SELECT * FROM Student")
+    details = cur.fetchall()
+    #print(details)
+    cur.close()
+    return details
+
+@app.route('/view_details/<string:student_email>')
+def view_details(student_email):
+    user_profile = get_Details(student_email)
+    return render_template('cds/view_details.html', user_profile=user_profile)
+
+def get_Details(student_email):
+
+    cur = mysql.connection.cursor()
+
+    # Fetch the user profile data from the database
+    cur.execute("SELECT * FROM Student WHERE Student_Email_Id = %s", (student_email,))
+    user_profile = cur.fetchone()
+    cur.close()
+    return user_profile
+
+@app.route('/go_back')
+def go_back():
+    return render_template('cds/dashboard.html')
+
+@app.route('/see_opportunities')
+def see_opportunities():
+    opportunities = see_opportunities()
+    return render_template('cds/opportunities.html', opportunities=opportunities)
+
+
+def see_opportunities():
+    cur = mysql.connection.cursor()
+    cur.execute("SELECT * FROM Opportunity")
+    opportunities = cur.fetchall()
+    # print(opportunities)
+    cur.close()
+    return opportunities
+
+
 if __name__ == '__main__':
     app.run(debug=True)
