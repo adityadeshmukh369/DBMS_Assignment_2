@@ -10,43 +10,43 @@
 
 <body>
     <div class="box">
-        <h2 class="h3box">Create Opportunity</h2>
+        <h2 class="h3box">{{title}}</h2>
         <form method="POST" action="/save_opportunity" enctype="multipart/form-data">
 
             <label for="oppTitle" class="label-box">Opportunity Title:</label>
-            <input type="text" id="oppTitle" name="Opp_Title" placeholder="Enter opportunity title" class="input-box" required>
+            <input value="{{opportunity[1]}}" type="text" id="oppTitle" name="Opp_Title" placeholder="Enter opportunity title" class="input-box" required>
 
             <label for="noOfPositions" class="label-box">Number of Positions:</label>
-            <input type="number" id="noOfPositions" name="No_of_Positions" placeholder="Enter number of positions" class="input-box" required>
+            <input value="{{opportunity[2]}}" type="number" id="noOfPositions" name="No_of_Positions" placeholder="Enter number of positions" class="input-box" required>
 
             <label for="specificRequirementsFile" class="label-box">Specific Requirements File:</label>
-            <input type="file" id="specificRequirementsFile" name="Specific_Requirements_file" placeholder="Choose file" class="input-box">
+            <input value="{{opportunity[3]}}" type="file" id="specificRequirementsFile" name="Specific_Requirements_file" placeholder="Choose file" class="input-box">
 
             <label for="minCPIReq" class="label-box">Minimum CPI Requirement:</label>
-            <input type="number" step="0.1" id="minCPIReq" name="Min_CPI_req" placeholder="Enter minimum CPI requirement" class="input-box" required>
+            <input value="{{opportunity[4]}}" type="number" step="0.1" id="minCPIReq" name="Min_CPI_req" placeholder="Enter minimum CPI requirement" class="input-box" required>
 
             <label for="noActiveBacklogs" class="label-box">Number of Active Backlogs:</label>
-            <input type="text" id="noActiveBacklogs" name="No_Active_Backlogs" placeholder="Enter number of active backlogs" class="input-box" required>
+            <input value="{{opportunity[5]}}" type="text" id="noActiveBacklogs" name="No_Active_Backlogs" placeholder="Enter number of active backlogs" class="input-box" required>
 
             <label for="studentYearReq" class="label-box">Student Year Requirement:</label>
-            <input type="number" id="studentYearReq" name="Student_year_req" placeholder="Enter student year requirement" class="input-box" required>
+            <input value="{{opportunity[6]}}" type="number" id="studentYearReq" name="Student_year_req" placeholder="Enter student year requirement" class="input-box" required>
 
             <label for="programReq" class="label-box">Program Requirement:</label>
-            <input type="text" id="programReq" name="Program_req" placeholder="Enter program requirement" class="input-box" required>
+            <input value="{{opportunity[7]}}" type="text" id="programReq" name="Program_req" placeholder="Enter program requirement" class="input-box" required>
 
             <label for="jobDescriptionFile" class="label-box">Job Description File:</label>
-            <input type="file" id="jobDescriptionFile" name="Job_Description_file" placeholder="Choose file" class="input-box">
+            <input value="{{opportunity[8]}}" type="file" id="jobDescriptionFile" name="Job_Description_file" placeholder="Choose file" class="input-box">
 
             <label for="postedOn" class="label-box">Posted On:</label>
-            <input type="date" id="postedOn" name="Posted_on" placeholder="Enter posting date" class="input-box" required>
+            <input value="{{opportunity[9]}}" type="date" id="postedOn" name="Posted_on" placeholder="Enter posting date" class="input-box" required>
 
             <label for="deadline" class="label-box">Deadline:</label>
-            <input type="date" id="deadline" name="Deadline" placeholder="Enter deadline" class="input-box" required>
+            <input value="{{opportunity[10]}}" type="date" id="deadline" name="Deadline" placeholder="Enter deadline" class="input-box" required>
 
             <label for="salary" class="label-box">Salary:</label>
-            <input type="number" id="salary" name="Salary" placeholder="Enter salary" class="input-box" required>
+            <input value="{{opportunity[11]}}" type="number" id="salary" name="Salary" placeholder="Enter salary" class="input-box" required>
 
-            <input type="submit" value="Create Opportunity" class="btn">
+            <input type="submit" value="{{footer}}" class="btn">
         </form>
     </div>
 </body>
