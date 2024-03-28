@@ -113,20 +113,20 @@ h2 {
     transition: .3s all ease;
 }
 
-.custom-table tbody tr:hover td,
+/* .custom-table tbody tr:hover td,
 .custom-table tbody tr:focus td {
     color: #ffffff;
-}
+} */
 
-.custom-table tbody tr:hover td a,
+/* .custom-table tbody tr:hover td a,
 .custom-table tbody tr:focus td a {
     color: #ffffff;
-}
+} */
 
-.custom-table tbody tr:hover td .more,
+/* .custom-table tbody tr:hover td .more,
 .custom-table tbody tr:focus td .more {
     color: #ffffff;
-}
+} */
 
 .custom-table .td-box-wrap {
     padding: 0;

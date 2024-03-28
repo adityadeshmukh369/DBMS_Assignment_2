@@ -410,11 +410,51 @@ def create_opportunity():
     cur.execute("SELECT * FROM Person_of_Contact WHERE Poc_Email_Id = %s", (email,))
     poc_data = cur.fetchall()
     cur.close()
-
     if not poc_data:
-        # Redirect to the profile creation page if the user doesn't have a profile
         return render_template('recruiter/create_profile.html',title='Create Profile',user_profile={},footer="Create Profile")
-    return render_template('recruiter/host_opportunity.html',email=email)
+    return render_template('recruiter/host_opportunity.html',email=email,opportunity={},title='Create Opportunity',footer="Create Opportunity")
+
+
+# @app.route('/save_opportunity', methods=['POST'])
+# def save_opportunity():
+#     if 'email' not in session:
+#         return redirect(url_for('index'))
+
+#     email = session['email']
+
+#     # Fetching form data from the request
+#     opp_title = request.form['Opp_Title']
+#     no_of_positions = request.form['No_of_Positions']
+#     specific_requirements_file = request.files['Specific_Requirements_file']
+#     min_cpi_req = request.form['Min_CPI_req']
+#     no_active_backlogs = request.form['No_Active_Backlogs']
+#     student_year_req = request.form['Student_year_req']
+#     program_req = request.form['Program_req']
+#     job_description_file = request.files['Job_Description_file']
+#     posted_on = request.form['Posted_on']
+#     deadline = request.form['Deadline']
+#     salary = request.form['Salary']
+
+#     cur = mysql.connection.cursor()
+#     cur.execute("SELECT MAX(Opp_ID) FROM Opportunity")
+#     opp_id = cur.fetchone()[0]
+#     cur.close()
+#     if opp_id is None:
+#         opp_id = 1
+#     else:
+#         opp_id = opp_id + 1   
+
+#     cur = mysql.connection.cursor()
+#     query = "INSERT INTO Opportunity (Opp_ID, Opp_Title, No_of_Positions, Specific_Requirements_file, Min_CPI_req, No_Active_Backlogs, Student_year_req, Program_req, Job_Description_file, Posted_on, Deadline, Salary, POC_Email) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
+#     values = (opp_id, opp_title, no_of_positions, specific_requirements_file, min_cpi_req, no_active_backlogs, student_year_req, program_req, job_description_file, posted_on, deadline, salary, email)
+#     cur.execute(query, values)
+#     mysql.connection.commit()
+#     cur.close()
+
+#     return render_template('recruiter/dashboard.html')
+from flask import request, redirect, url_for, session
+from werkzeug.utils import secure_filename
+import os
 
 @app.route('/save_opportunity', methods=['POST'])
 def save_opportunity():
@@ -437,22 +477,31 @@ def save_opportunity():
     salary = request.form['Salary']
 
     cur = mysql.connection.cursor()
-    cur.execute("SELECT MAX(Opp_ID) FROM Opportunity")
-    opp_id = cur.fetchone()[0]
-    cur.close()
-    if opp_id is None:
-        opp_id = 1
-    else:
-        opp_id = opp_id + 1   
 
-    cur = mysql.connection.cursor()
-    query = "INSERT INTO Opportunity (Opp_ID, Opp_Title, No_of_Positions, Specific_Requirements_file, Min_CPI_req, No_Active_Backlogs, Student_year_req, Program_req, Job_Description_file, Posted_on, Deadline, Salary, POC_Email) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
-    values = (opp_id, opp_title, no_of_positions, specific_requirements_file, min_cpi_req, no_active_backlogs, student_year_req, program_req, job_description_file, posted_on, deadline, salary, email)
+    # Check if the opportunity already exists
+    cur.execute("SELECT Opp_ID FROM Opportunity WHERE Opp_Title = %s", (opp_title,))
+    existing_opp = cur.fetchone()
+
+    if existing_opp:  # If opportunity exists, update it
+        opp_id = existing_opp[0]
+        query = "UPDATE Opportunity SET Opp_Title = %s, No_of_Positions = %s, Specific_Requirements_file = %s, Min_CPI_req = %s, No_Active_Backlogs = %s, Student_year_req = %s, Program_req = %s, Job_Description_file = %s, Posted_on = %s, Deadline = %s, Salary = %s, POC_Email = %s WHERE Opp_ID = %s"
+        values = (opp_title, no_of_positions, specific_requirements_file, min_cpi_req, no_active_backlogs, student_year_req, program_req, job_description_file, posted_on, deadline, salary, email, opp_id)
+    else:  # If opportunity doesn't exist, insert it
+        cur.execute("SELECT MAX(Opp_ID) FROM Opportunity")
+        opp_id = cur.fetchone()[0]
+        if opp_id is None:
+            opp_id = 1
+        else:
+            opp_id = opp_id + 1
+        query = "INSERT INTO Opportunity (Opp_ID, Opp_Title, No_of_Positions, Specific_Requirements_file, Min_CPI_req, No_Active_Backlogs, Student_year_req, Program_req, Job_Description_file, Posted_on, Deadline, Salary, POC_Email) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
+        values = (opp_id, opp_title, no_of_positions, specific_requirements_file, min_cpi_req, no_active_backlogs, student_year_req, program_req, job_description_file, posted_on, deadline, salary, email)
+
+    # Execute the query and commit changes
     cur.execute(query, values)
     mysql.connection.commit()
     cur.close()
 
-    return render_template('recruiter/dashboard.html')
+    return redirect(url_for('dashboard_recruiter'))
 
 
 @app.route('/view_applications')
@@ -592,6 +641,36 @@ def create_profile_poc():
 
 
 # ================================================
+# Delete opportuinity -- Recuriter -- Opportunites.html
+@app.route('/delete_opportunity/<int:opp_id>', methods=['GET', 'POST'])
+def delete_opportunity(opp_id):
+    if 'email' not in session:
+        return redirect(url_for('index'))
+    cur = mysql.connection.cursor()
+    cur.execute("DELETE FROM Opportunity WHERE Opp_ID = %s", (opp_id,))
+    mysql.connection.commit()
+    cur.close()
+    return redirect(url_for('created_opportunity'))
+
+
+# ================================================
+# Edit opportuinity -- Recuriter -- Opportunites.html
+@app.route('/edit_opportunity/<int:opp_id>', methods=['GET', 'POST'])
+def edit_opportunity(opp_id):
+    if 'email' not in session:
+        return redirect(url_for('index'))
+    
+    email = session['email']
+    cur = mysql.connection.cursor()
+    cur.execute("SELECT * FROM Person_of_Contact WHERE Poc_Email_Id = %s", (email,))
+    poc_data = cur.fetchall()
+    cur.execute("SELECT * FROM Opportunity WHERE Opp_ID = %s", (opp_id,))
+    opportunity = cur.fetchone()
+    cur.close()
+    if not poc_data:
+        return render_template('recruiter/create_profile.html',title='Create Profile',user_profile={},footer="Create Profile")
+    return render_template('recruiter/host_opportunity.html',email=email,opportunity=opportunity,title='Edit Opportunity',footer="Update Opportunity")
+
 
 if __name__ == '__main__':
     app.run(debug=True)
