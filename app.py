@@ -415,43 +415,6 @@ def create_opportunity():
     return render_template('recruiter/host_opportunity.html',email=email,opportunity={},title='Create Opportunity',footer="Create Opportunity")
 
 
-# @app.route('/save_opportunity', methods=['POST'])
-# def save_opportunity():
-#     if 'email' not in session:
-#         return redirect(url_for('index'))
-
-#     email = session['email']
-
-#     # Fetching form data from the request
-#     opp_title = request.form['Opp_Title']
-#     no_of_positions = request.form['No_of_Positions']
-#     specific_requirements_file = request.files['Specific_Requirements_file']
-#     min_cpi_req = request.form['Min_CPI_req']
-#     no_active_backlogs = request.form['No_Active_Backlogs']
-#     student_year_req = request.form['Student_year_req']
-#     program_req = request.form['Program_req']
-#     job_description_file = request.files['Job_Description_file']
-#     posted_on = request.form['Posted_on']
-#     deadline = request.form['Deadline']
-#     salary = request.form['Salary']
-
-#     cur = mysql.connection.cursor()
-#     cur.execute("SELECT MAX(Opp_ID) FROM Opportunity")
-#     opp_id = cur.fetchone()[0]
-#     cur.close()
-#     if opp_id is None:
-#         opp_id = 1
-#     else:
-#         opp_id = opp_id + 1   
-
-#     cur = mysql.connection.cursor()
-#     query = "INSERT INTO Opportunity (Opp_ID, Opp_Title, No_of_Positions, Specific_Requirements_file, Min_CPI_req, No_Active_Backlogs, Student_year_req, Program_req, Job_Description_file, Posted_on, Deadline, Salary, POC_Email) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
-#     values = (opp_id, opp_title, no_of_positions, specific_requirements_file, min_cpi_req, no_active_backlogs, student_year_req, program_req, job_description_file, posted_on, deadline, salary, email)
-#     cur.execute(query, values)
-#     mysql.connection.commit()
-#     cur.close()
-
-#     return render_template('recruiter/dashboard.html')
 from flask import request, redirect, url_for, session
 from werkzeug.utils import secure_filename
 import os
@@ -639,6 +602,13 @@ def create_profile_poc():
 
     return render_template('cds/add_poc.html', title='Create Profile', user_profile={}, footer="Create Profile")
 
+@app.route('/cds_dashboard')
+def cds_dashboard():
+    if 'email' not in session:
+        return redirect(url_for('index'))
+    email = session.get('email')
+    name = session.get('name')
+    return render_template('cds/dashboard.html', email=email, name=name)
 
 # ================================================
 # Delete opportuinity -- Recuriter -- Opportunites.html
