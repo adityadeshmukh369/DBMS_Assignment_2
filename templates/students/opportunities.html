@@ -33,30 +33,26 @@
                 <table class="table table-striped custom-table">
                     <thead>
                         <tr>
-                            <th scope="col">ID</th>
+                            <th scope="col">Company</th>
                             <th scope="col">Title</th>
                             <th scope="col">Department</th>
                             <th scope="col">Description</th>
                             <th scope="col">Salary</th>
-                            <th scope="col">Remote</th>
                             <th scope="col">CPI requirement</th>
                             <th scope="col">Number of Position</th>
-                            <th scope="col">Application Deadline</th>
                         </tr>
 
                     </thead>
                     <tbody>
                         {% for opportunity in opportunities %}
                         <tr>
-                            <td>{{ opportunity[0] }}</td>
+                            <td>{{ opportunity[11] }}</td>
                             <td>{{ opportunity[1] }}</td>
                             <td>{{ opportunity[7] }}</td>
                             <td>{{ opportunity[3] }}</td>
-                            <td>{{ opportunity[11] }}</td>
-                            <td>{{ "Yes" if opportunity[5] else "No" }}</td>
+                            <td>{{ opportunity[9] }}</td>
                             <td>{{ opportunity[4] }}</td>
                             <td>{{ opportunity[2] }}</td>
-                            <td>{{ opportunity[10] }}</td>
                             <td>
                                 <form action="{{ url_for('apply') }}" method="post">
                                     <input type="hidden" name="opportunity_id" value="{{ opportunity[0] }}">

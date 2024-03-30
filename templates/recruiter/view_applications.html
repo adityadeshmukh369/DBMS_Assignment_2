@@ -12,6 +12,11 @@
     <link rel="stylesheet" href="/static/dashStyle.css">
     <title>Recruiter Dashboard</title>
 </head>
+<script>
+    function displayPopup() {
+        alert("Updated successfully!");
+    }
+</script>
 <body>
     <div class="content">
         <div class="container">
@@ -39,7 +44,7 @@
                             <td>{{ application[2] }}</td>
                             <!-- <td>{{ application[3] }}</td> -->
                             <td>
-                                <form class"form_css" action="{{ url_for('update_status', student_id=application[0], opp_id=application[1]) }}" method="post">
+                                <form class"form_css" action="{{ url_for('update_status', student_id=application[0], opp_id=application[1]) }}" method="post" onsubmit="displayPopup()">
 
                                     <select name="status" class="input-custom" class="form-control">
                                         <option value="Pending" {% if application[3] == 'Pending' %} selected {% endif %}>Pending</option>

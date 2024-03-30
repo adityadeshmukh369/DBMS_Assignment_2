@@ -121,16 +121,11 @@ def apply():
 def apply_opportunity():
     opportunity_id = request.form.get('opportunity_id')
     student_id = request.form.get('student_id')
-    resume = request.files.get('resume')
-
-    if resume:
-        resume_filename = f"{uuid.uuid4().hex}_{resume.filename}"
-        # resume.save(os.path.join('uploads', resume_filename))
-        # print(f"Resume saved: {resume_filename}")
+    resume = request.form.get('resume')
 
     cur = mysql.connection.cursor()
     query = "INSERT INTO Application (Student_ID, Status,Opp_ID, Resume_File) VALUES (%s, %s, %s, %s)"
-    values = (student_id,"Pending",opportunity_id, resume_filename)
+    values = (student_id,"Pending",opportunity_id, resume)
     cur.execute(query, values)
     mysql.connection.commit()
     flash("Form submitted successfully!", "success")
@@ -150,7 +145,7 @@ def status_opp_student():
     student_id = cur.fetchone()[0]
     cur = mysql.connection.cursor()
 
-    cur.execute("SELECT A.*, O.Opp_Title FROM Application A JOIN Opportunity O ON A.Opp_ID = O.Opp_ID WHERE A.Student_ID = %s", (student_id,))
+    cur.execute("SELECT A.*, O.Opp_Title, O.Company FROM Application A JOIN Opportunity O ON A.Opp_ID = O.Opp_ID WHERE A.Student_ID = %s", (student_id,))
     applications = cur.fetchall()
     print(applications)
     cur.close()
@@ -197,11 +192,13 @@ def create_profile():
 
 
         # Handle student image upload
-        studentImage = request.files.get('studentImage')
-        studentImagePath = None
-        if studentImage:
-            studentImageFilename = secure_filename(studentImage.filename)
-            studentImagePath = os.path.join(app.config['images_folder'], studentImageFilename)
+        studentImage = request.form.get('studentImage')
+        CPI = request.form.get('CPI')
+        SSAC_or_not = request.form.get('SSAC_or_not') 
+        # studentImagePath = None
+        # if studentImage:
+        #     studentImageFilename = secure_filename(studentImage.filename)
+        #     studentImagePath = os.path.join(app.config['images_folder'], studentImageFilename)
 
         cur = mysql.connection.cursor()
 
@@ -212,8 +209,8 @@ def create_profile():
         if existing_user:
             # User already exists, update the profile
             student_id = existing_user[0]
-            query = "UPDATE Student SET Student_First_Name = %s, Student_Middle_Name = %s, Student_Last_Name = %s, Active_Backlog = %s, Department = %s, Gender = %s, Year = %s, Student_Image = %s, Minors = %s, Contact_Number = %s WHERE Student_ID = %s"
-            values = (firstName, middleName, lastName, activeBacklog, department, gender, currentYear, studentImagePath, minors, contactNumber, student_id)
+            query = "UPDATE Student SET Student_First_Name = %s, Student_Middle_Name = %s, Student_Last_Name = %s, Active_Backlog = %s, Department = %s, Gender = %s, Year = %s, Student_Image = %s, Minors = %s, Contact_Number = %s, CPI = %s, SSAC_or_not = %s WHERE Student_ID = %s"
+            values = (firstName, middleName, lastName, activeBacklog, department, gender, currentYear, studentImage, minors, contactNumber, CPI, SSAC_or_not, student_id)
             cur.execute(query, values)
             mysql.connection.commit()
             flash("Profile updated successfully!", "success")
@@ -222,8 +219,8 @@ def create_profile():
             cur.execute("SELECT MAX(Student_ID) FROM Student")
             last_student_id = cur.fetchone()[0]
             new_student_id = last_student_id + 1 if last_student_id else 1
-            query = "INSERT INTO Student (Student_ID, Student_First_Name, Student_Middle_Name, Student_Last_Name, Active_Backlog, Department, Gender, Year, Student_Image, Minors, Student_Email_Id, Contact_Number) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
-            values = (new_student_id, firstName, middleName, lastName, activeBacklog, department, gender, currentYear, studentImagePath, minors, email, contactNumber)
+            query = "INSERT INTO Student (Student_ID, Student_First_Name, Student_Middle_Name, Student_Last_Name, Active_Backlog, Department, Gender, Year, Student_Image, Minors, Student_Email_Id, Contact_Number, CPI, SSAC_or_not) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
+            values = (new_student_id, firstName, middleName, lastName, activeBacklog, department, gender, currentYear, studentImage, minors, email, contactNumber, CPI, SSAC_or_not)
             cur.execute(query, values)
             mysql.connection.commit()
             flash("Profile created successfully!", "success")
@@ -412,46 +409,8 @@ def create_opportunity():
     cur.close()
     if not poc_data:
         return render_template('recruiter/create_profile.html',title='Create Profile',user_profile={},footer="Create Profile")
-    return render_template('recruiter/host_opportunity.html',email=email,opportunity={},title='Create Opportunity',footer="Create Opportunity")
+    return render_template('recruiter/host_opportunity.html',opp_id=-1,email=email,opportunity={},rounds={},title='Create Opportunity',footer="Create Opportunity")
 
-
-# @app.route('/save_opportunity', methods=['POST'])
-# def save_opportunity():
-#     if 'email' not in session:
-#         return redirect(url_for('index'))
-
-#     email = session['email']
-
-#     # Fetching form data from the request
-#     opp_title = request.form['Opp_Title']
-#     no_of_positions = request.form['No_of_Positions']
-#     specific_requirements_file = request.files['Specific_Requirements_file']
-#     min_cpi_req = request.form['Min_CPI_req']
-#     no_active_backlogs = request.form['No_Active_Backlogs']
-#     student_year_req = request.form['Student_year_req']
-#     program_req = request.form['Program_req']
-#     job_description_file = request.files['Job_Description_file']
-#     posted_on = request.form['Posted_on']
-#     deadline = request.form['Deadline']
-#     salary = request.form['Salary']
-
-#     cur = mysql.connection.cursor()
-#     cur.execute("SELECT MAX(Opp_ID) FROM Opportunity")
-#     opp_id = cur.fetchone()[0]
-#     cur.close()
-#     if opp_id is None:
-#         opp_id = 1
-#     else:
-#         opp_id = opp_id + 1   
-
-#     cur = mysql.connection.cursor()
-#     query = "INSERT INTO Opportunity (Opp_ID, Opp_Title, No_of_Positions, Specific_Requirements_file, Min_CPI_req, No_Active_Backlogs, Student_year_req, Program_req, Job_Description_file, Posted_on, Deadline, Salary, POC_Email) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
-#     values = (opp_id, opp_title, no_of_positions, specific_requirements_file, min_cpi_req, no_active_backlogs, student_year_req, program_req, job_description_file, posted_on, deadline, salary, email)
-#     cur.execute(query, values)
-#     mysql.connection.commit()
-#     cur.close()
-
-#     return render_template('recruiter/dashboard.html')
 from flask import request, redirect, url_for, session
 from werkzeug.utils import secure_filename
 import os
@@ -462,45 +421,75 @@ def save_opportunity():
         return redirect(url_for('index'))
 
     email = session['email']
-
-    # Fetching form data from the request
+    opp_id = request.form['opp_id']
     opp_title = request.form['Opp_Title']
+    Company = request.form['Company']
     no_of_positions = request.form['No_of_Positions']
-    specific_requirements_file = request.files['Specific_Requirements_file']
+    specific_requirements_file = request.form['Specific_Requirements_file']
     min_cpi_req = request.form['Min_CPI_req']
     no_active_backlogs = request.form['No_Active_Backlogs']
     student_year_req = request.form['Student_year_req']
     program_req = request.form['Program_req']
-    job_description_file = request.files['Job_Description_file']
-    posted_on = request.form['Posted_on']
-    deadline = request.form['Deadline']
+    job_description_file = request.form['Job_Description_file']
     salary = request.form['Salary']
-
+    rounds = int(request.form['No_of_Rounds'])  # Number of rounds
+    round_details = []  # List to store round details
     cur = mysql.connection.cursor()
 
+
+    for i in range(1, rounds + 1):
+        round_type = request.form[f'Round_Type{i}']
+        round_date = request.form[f'Round_Date{i}']
+        round_venue = request.form[f'Round_Venue{i}']
+        round_start_time = request.form[f'Round_Start_Time{i}']
+        round_end_time = request.form[f'Round_End_Time{i}']
+        round_details.append((round_type, round_date, round_venue, round_start_time, round_end_time))
+
     # Check if the opportunity already exists
-    cur.execute("SELECT Opp_ID FROM Opportunity WHERE Opp_Title = %s", (opp_title,))
-    existing_opp = cur.fetchone()
+    # cur.execute("SELECT Opp_ID FROM Opportunity WHERE Opp_Title = %s", (opp_title,))
+    # existing_opp = cur.fetchone()
+    # if opp_id != -1 :
+    # # print(round_details)
+    # # if existing_opp:  
+    # #     opp_id = existing_opp[0]
+    # #     query = "UPDATE Opportunity SET Opp_Title = %s, No_of_Positions = %s, Specific_Requirements_file = %s, Min_CPI_req = %s, No_Active_Backlogs = %s, Student_year_req = %s, Program_req = %s, Job_Description_file = %s, Posted_on = %s, Deadline = %s, Salary = %s, POC_Email = %s WHERE Opp_ID = %s"
+    # #     values = (opp_title, no_of_positions, specific_requirements_file, min_cpi_req, no_active_backlogs, student_year_req, program_req, job_description_file, posted_on, deadline, salary, email, opp_id)
+    # # else:  # If opportunity doesn't exist, insert it
 
-    if existing_opp:  # If opportunity exists, update it
-        opp_id = existing_opp[0]
-        query = "UPDATE Opportunity SET Opp_Title = %s, No_of_Positions = %s, Specific_Requirements_file = %s, Min_CPI_req = %s, No_Active_Backlogs = %s, Student_year_req = %s, Program_req = %s, Job_Description_file = %s, Posted_on = %s, Deadline = %s, Salary = %s, POC_Email = %s WHERE Opp_ID = %s"
-        values = (opp_title, no_of_positions, specific_requirements_file, min_cpi_req, no_active_backlogs, student_year_req, program_req, job_description_file, posted_on, deadline, salary, email, opp_id)
-    else:  # If opportunity doesn't exist, insert it
-        cur.execute("SELECT MAX(Opp_ID) FROM Opportunity")
-        opp_id = cur.fetchone()[0]
-        if opp_id is None:
-            opp_id = 1
-        else:
-            opp_id = opp_id + 1
-        query = "INSERT INTO Opportunity (Opp_ID, Opp_Title, No_of_Positions, Specific_Requirements_file, Min_CPI_req, No_Active_Backlogs, Student_year_req, Program_req, Job_Description_file, Posted_on, Deadline, Salary, POC_Email) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
-        values = (opp_id, opp_title, no_of_positions, specific_requirements_file, min_cpi_req, no_active_backlogs, student_year_req, program_req, job_description_file, posted_on, deadline, salary, email)
 
-    # Execute the query and commit changes
+    #     query = "UPDATE INTO Opportunity (Opp_ID, Opp_Title, No_of_Positions, Specific_Requirements_file, Min_CPI_req, No_Active_Backlogs, Student_year_req, Program_req, Job_Description_file, Salary, POC_Email) VALUES ( %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
+    #     values = (opp_id, opp_title, no_of_positions, specific_requirements_file, min_cpi_req, no_active_backlogs, student_year_req, program_req, job_description_file, salary, email)
+    #     cur.execute(query, values)
+    #     mysql.connection.commit()
+
+    #     for i, round_detail in enumerate(round_details, start=1):
+    #         round_type, round_date, round_venue, round_start_time, round_end_time = round_detail
+    #         cur.execute("""
+    #             INSERT INTO Round (Opp_ID, Round_ID, Type, Date, Venue, Start_Time, End_Time)
+    #             VALUES (%s, %s, %s, %s, %s, %s, %s)
+    #         """, (opp_id, i, round_type, round_date, round_venue, round_start_time, round_end_time))
+    #         mysql.connection.commit()
+
+
+    cur.execute("SELECT MAX(Opp_ID) FROM Opportunity")
+    opp_id = cur.fetchone()[0]
+    if opp_id is None:
+        opp_id = 1
+    else:
+        opp_id = opp_id + 1
+    query = "INSERT INTO Opportunity (Opp_ID, Opp_Title, No_of_Positions, Specific_Requirements_file, Min_CPI_req, No_Active_Backlogs, Student_year_req, Program_req, Job_Description_file, Salary, POC_Email,Company) VALUES ( %s,%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
+    values = (opp_id, opp_title, no_of_positions, specific_requirements_file, min_cpi_req, no_active_backlogs, student_year_req, program_req, job_description_file, salary, email,Company)
     cur.execute(query, values)
     mysql.connection.commit()
-    cur.close()
 
+    for i, round_detail in enumerate(round_details, start=1):
+        round_type, round_date, round_venue, round_start_time, round_end_time = round_detail
+        cur.execute("""
+            INSERT INTO Round (Opp_ID, Round_ID, Type, Date, Venue, Start_Time, End_Time)
+            VALUES (%s, %s, %s, %s, %s, %s, %s)
+        """, (opp_id, i, round_type, round_date, round_venue, round_start_time, round_end_time))
+        mysql.connection.commit()
+    cur.close()
     return redirect(url_for('dashboard_recruiter'))
 
 
@@ -666,13 +655,70 @@ def edit_opportunity(opp_id):
     poc_data = cur.fetchall()
     cur.execute("SELECT * FROM Opportunity WHERE Opp_ID = %s", (opp_id,))
     opportunity = cur.fetchone()
+
+    cur.execute("SELECT * FROM Round WHERE Opp_ID = %s", (opp_id,))
+    rounds = cur.fetchall()
+    print(rounds)
     cur.close()
     if not poc_data:
         return render_template('recruiter/create_profile.html',title='Create Profile',user_profile={},footer="Create Profile")
-    return render_template('recruiter/host_opportunity.html',email=email,opportunity=opportunity,title='Edit Opportunity',footer="Update Opportunity")
+    return render_template('recruiter/host_opportunity.html',opp_id=opp_id,email=email,opportunity=opportunity,rounds=rounds,title='Edit Opportunity',footer="Update Opportunity")
+
+
+
+
+# import datetime
+# @app.route('/edit_opportunity/<int:opp_id>', methods=['GET', 'POST'])
+# def edit_opportunity(opp_id):
+#     if 'email' not in session:
+#         return redirect(url_for('index'))
+#     email = session['email']
+#     cur = mysql.connection.cursor()
+#     cur.execute("SELECT * FROM Person_of_Contact WHERE Poc_Email_Id = %s", (email,))
+#     poc_data = cur.fetchall()
+#     cur.execute("SELECT * FROM Opportunity WHERE Opp_ID = %s", (opp_id,))
+#     opportunity = cur.fetchone()
+#     cur.execute("SELECT * FROM Round WHERE Opp_ID = %s", (opp_id,))
+#     rounds = cur.fetchall()
+#     print(rounds)
+#     cur.close()
+
+#     # Convert rounds to a list of dictionaries
+#     round_details = []
+#     for round_data in rounds:
+#         start_time = (datetime.min + round_data[5]).time()  # Convert timedelta to time object
+#         end_time = (datetime.min + round_data[6]).time()  # Convert timedelta to time object
+#         round_details.append({
+#             'roundType': round_data[2],
+#             'roundDate': round_data[3].strftime('%Y-%m-%d'),  # Convert date to string in the desired format
+#             'roundVenue': round_data[4],
+#             'roundStartTime': round_data[5].strftime('%H:%M'),  # Convert time to string in the desired format
+#             'roundEndTime': round_data[6].strftime('%H:%M')  # Convert time to string in the desired format
+#         })
+
+#     if not poc_data:
+#         return render_template('recruiter/create_profile.html', title='Create Profile', user_profile={}, footer="Create Profile")
+#     return render_template('recruiter/host_opportunity.html', opp_id=opp_id, email=email, opportunity=opportunity, rounds=round_details, title='Edit Opportunity', footer="Update Opportunity")
+
 
 
 # =============================================================
+#  OPPORTUNITY DETAILS
+
+@app.route('/opportunity_details/<int:opp_id>')
+def opportunity_details(opp_id):
+    if 'email' not in session:
+        return redirect(url_for('index'))
+    email = session['email']
+    cur = mysql.connection.cursor()
+    cur.execute("SELECT * FROM Opportunity WHERE Opp_ID = %s", (opp_id,))
+    opportunity = cur.fetchone()
+    cur.execute("SELECT * FROM Round WHERE Opp_ID = %s", (opp_id,))
+    rounds = cur.fetchall()
+    return render_template('recruiter/opportunity_details.html', opportunity=opportunity, rounds=rounds)
+
+# =============================================================
+
 @app.route('/student_Details')
 def student_Details():
     details = get_student_Details()

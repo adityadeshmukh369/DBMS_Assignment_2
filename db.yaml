@@ -1,6 +1,6 @@
 mysql_host: '127.0.0.1'
 mysql_user: 'root'
 mysql_password: 'AdityA@369'
-mysql_db: 'Iter1'
+mysql_db: 'Iter2'
 images_folder: '/Users/adityasantoshdeshmukh/Desktop/webD/assignment3Databases/data_files/images'
 resume_folder: '/Users/adityasantoshdeshmukh/Desktop/webD/assignment3Databases/data_files/resumes'

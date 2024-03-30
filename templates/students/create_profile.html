@@ -8,12 +8,15 @@
     <link rel="stylesheet" href="/static/create_profile.css">
 </head>
 
+<script>
+    function displayPopup() {
+        alert("Submit profile successfully!");
+    }
+</script>
 <body>
-
     <div class="box">
         <h2 class="h3box">{{ title }}</h2>
-        <form action="{{ url_for('create_profile') }}" method="post" enctype="multipart/form-data">
-
+        <form action="{{ url_for('create_profile') }}" method="post" enctype="multipart/form-data" onsubmit="displayPopup()">
 
             <label for="firstName">First Name</label>
             <input type="text" value="{{user_profile[1]}}" name="firstName" id="firstName" placeholder="Enter Your First Name" class="input-box" required>
@@ -26,18 +29,28 @@
 
             <label for="branch">Department</label>
             <input type="text" value="{{user_profile[4]}}" name="department" id="branch" placeholder="Enter Your Department" class="input-box" required>
-            <!-- <br><br> -->
+
             <label for="activeBacklog">Active Backlog</label>
             <input type="text" value="{{user_profile[5]}}" name="activeBacklog" id="activeBacklog" placeholder="Enter Your Backlog" class="input-box" required>
 
             <label for="currentYear">Current Year</label>
             <input type="text" value="{{user_profile[7]}}" name="currentYear" id="currentYear" placeholder="Enter Your Current Year" class="input-box" required>
-            <!-- <br><br> -->
+
             <label for="Minor">Minor</label>
             <input type="text" value="{{user_profile[9]}}" name="minors" id="Minor" placeholder="Enter Your Minor" class="input-box" required>
-            <!-- <br><br> -->
+
             <label for="contactNumber">Contact Number</label>
             <input type="text" value="{{user_profile[11]}}" name="contactNumber" id="contactNumber" placeholder="Enter Your Contact Number" class="input-box" required>
+
+            <label for="CPI">CPI</label>
+            <input type="text" value="{{user_profile[12]}}" name="CPI" id="CPI" placeholder="Enter Your CPI" class="input-box" required>
+
+            <label for="SSAC_or_not">SSAC_or_not:</label>
+            <select id="SSAC_or_not" name="SSAC_or_not" class="input-box" required>
+                <option value="">Select</option>
+                <option value="Yes" {% if user_profile[13]=='Yes' %}selected{% endif %}>Yes</option>
+                <option value="No" {% if user_profile[13]=='No' %}selected{% endif %}>No</option>
+            </select>
 
             <label for="gender">Gender:</label>
             <select id="gender" name="gender" class="input-box" required>
@@ -47,8 +60,8 @@
                 <option value="Other" {% if user_profile[6] == 'Other' %}selected{% endif %}>Other</option>
             </select>
 
-            <label for="studentImage">Student Image:</label>
-            <input type="file" value="{{user_profile[8]}}" id="studentImage" name="studentImage" class="input-box" accept="image/*">
+            <label for="studentImage">Student Image Link :</label>
+            <input type="text" placeholder="Enter Image Link" value="{{user_profile[8]}}" id="studentImage" name="studentImage" class="input-box" accept="image/*">
 
             <button type="submit" class="btn">{{footer}}</button>
         </form>

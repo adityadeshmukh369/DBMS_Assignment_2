@@ -36,9 +36,9 @@
                             <th scope="col">Title</th>
                             <th scope="col">Positions</th>
                             <th scope="col">Salary</th>
-                            <th scope="col">Deadline</th>
                             <th scope="col">Applications</th>
-                            <th scope="col">Edit opportunity</th>
+                            <th scope="col">Opportunity Details</th>
+                            <!-- <th scope="col">Edit opportunity</th> -->
                             <th scope="col">Delete opportunity</th>
                         </tr>
                     </thead>
@@ -47,10 +47,10 @@
                         <tr>
                             <td>{{ opportunity[1] }}</td>
                             <td>{{ opportunity[2] }}</td>
-                            <td>{{ opportunity[11] }}</td>
-                            <td>{{ opportunity[10] }}</td>
+                            <td>{{ opportunity[9] }}</td>
                             <td><a class="button_custom" href="{{ url_for('view_applications', opp_id=opportunity[0]) }}">View Applications</a></td>
-                            <td><a class="button_custom" href="{{ url_for('edit_opportunity', opp_id=opportunity[0]) }}">Edit Opportunity</a></td>
+                            <td><a class="button_custom" href="{{ url_for('opportunity_details', opp_id=opportunity[0]) }}">Applications Details</a></td>
+                            <!-- <td><a class="button_custom" href="{{ url_for('edit_opportunity', opp_id=opportunity[0]) }}">Edit Opportunity</a></td> -->
                             <td><a class="button_custom" href="{{ url_for('delete_opportunity', opp_id=opportunity[0]) }}">Delete Opportunity</a></td>
                         </tr>
                         {% endfor %}

@@ -155,3 +155,29 @@ label {
         transform: scale(1);
     }
 }
+
+.round-details {
+    border: 1px solid #ccc;
+    padding: 10px;
+    margin-bottom: 20px;
+    border-radius: 5px;
+}
+
+.round-details h3 {
+    margin-top: 0;
+}
+
+.round-details label {
+    display: block;
+    margin-bottom: 5px;
+}
+
+.round-details input,.round-details select  {
+    width: calc(100% - 10px); /* Adjust as needed */
+    padding: 5px;
+    /* margin-bottom: 10px; */
+}
+
+.round-details label {
+    font-size: smaller;
+}

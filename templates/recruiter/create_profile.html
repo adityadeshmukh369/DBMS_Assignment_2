@@ -7,11 +7,15 @@
     <title>Create Profile</title>
     <link rel="stylesheet" href="/static/create_profile.css">
 </head>
-
+<script>
+    function displayPopup() {
+        alert("Opportunity has been created successfully!");
+    }
+</script>
 <body>
     <div class="box">
         <h2 class="h3box">{{ title }}</h2>
-        <form action="{{ url_for('create_profile_recruiter') }}" method="post" enctype="multipart/form-data">
+        <form action="{{ url_for('create_profile_recruiter') }}" method="post" enctype="multipart/form-data" onsubmit="displayPopup()">
 
             <label for="firstName" class="label-box">First Name:</label>
             <input type="text" value="{{user_profile[2]}}" id="firstName" name="firstName" class="input-box" required>

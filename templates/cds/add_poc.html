@@ -7,33 +7,37 @@
     <title>Create Profile</title>
     <link rel="stylesheet" href="/static/create_profile.css">
 </head>
-
+<script>
+    function displayPopup() {
+        alert("Added successfully!");
+    }
+</script>
 <body>
     <div class="box">
         <h2 class="h3box">{{ title }} for POC</h2>
-        <form action="{{ url_for('create_profile_poc') }}" method="post" enctype="multipart/form-data">
+        <form action="{{ url_for('create_profile_poc') }}" method="post" enctype="multipart/form-data" onsubmit="displayPopup()">
 
             <label for="firstName" class="label-box">First Name:</label>
-            <input type="text" value="{{user_profile[2]}}" id="firstName" name="firstName" class="input-box" required placeholder="Enter your first name">
+            <input type="text" value="{{user_profile[2]}}" id="firstName" name="firstName" class="input-box" required placeholder="Enter POC first name">
 
 
             <label for="middleName" class="label-box">Middle Name:</label>
-            <input type="text" value="{{user_profile[3]}}" id="middleName" name="middleName" class="input-box" placeholder="Enter your middle name">
+            <input type="text" value="{{user_profile[3]}}" id="middleName" name="middleName" class="input-box" placeholder="Enter POC middle name">
 
             <label for="lastName" class="label-box">Last Name:</label>
-            <input type="text" value="{{user_profile[4]}}" id="lastName" name="lastName" class="input-box" required placeholder="Enter your last name">
+            <input type="text" value="{{user_profile[4]}}" id="lastName" name="lastName" class="input-box" required placeholder="Enter POC last name">
 
             <label for="Email" class="label-box">Email:</label>
-            <input type="text" value="{{user_profile[0]}}" id="Email" name="Email" class="input-box" required placeholder="Enter your first email">
+            <input type="text" value="{{user_profile[0]}}" id="Email" name="Email" class="input-box" required placeholder="Enter POC first email">
 
             <label for="designation" class="label-box">Designation:</label>
-            <input type="text" value="{{user_profile[5]}}" id="department" name="designation" class="input-box" required placeholder="Enter your designation">
+            <input type="text" value="{{user_profile[5]}}" id="department" name="designation" class="input-box" required placeholder="Enter POC designation">
 
             <label for="companyName" class="label-box">Company Name:</label>
-            <input type="text" value="{{user_profile[-1]}}" id="companyName" name="companyName" class="input-box" required placeholder="Enter your company name">
+            <input type="text" value="{{user_profile[-1]}}" id="companyName" name="companyName" class="input-box" required placeholder="Enter POC company name">
 
             <label for="contactNumber" class="label-box">Contact Number:</label>
-            <input type="tel" value="{{user_profile[1]}}" id="contactNumber" name="contactNumber" class="input-box" placeholder="Enter your contact number">
+            <input type="tel" value="{{user_profile[1]}}" id="contactNumber" name="contactNumber" class="input-box" placeholder="Enter POC contact number">
 
             <label for="interviewer" class="label-box">Are you an interviewer?</label>
             <select id="interviewer" name="interviewer" class="input-box" placeholder="Select">

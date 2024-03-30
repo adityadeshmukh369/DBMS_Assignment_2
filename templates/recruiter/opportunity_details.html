@@ -12,8 +12,8 @@
 
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
 
-    <link rel="stylesheet" href="/static/dashStyle.css">
-    <title>Student Dashboard</title>
+    <link rel="stylesheet" href="/static/profile.css">
+    <title>Recruiter Dashboard</title>
 
 </head>
 
@@ -21,37 +21,49 @@
     <div class="content">
         <div class="container">
             <div class="d-flex justify-content-between align-items-center mb-4">
-                <h1 class="welocme">Opportunities Status</h1>
+                <h1 class="welocme">Opportunity Details</h1>
                 <div>
-                    <a class="button_custom" href="{{ url_for('dashboard') }}">Dashboard</a>
+                    <a class="button_custom" href="{{ url_for('dashboard_recruiter') }}">Dashboard</a>
                     <a class="button_custom" href="{{ url_for('logout') }}">Logout</a>
                 </div>
 
             </div>
-            {% if applications %}
+            <p>Title : {{opportunity[1]}}</p>
+            <p>Positions : {{opportunity[2]}}</p>
+            <p>Salary : {{opportunity[9]}}</p>
+            <p>Requirements : {{opportunity[3]}}</p>
+            <p>CPI requirement : {{opportunity[4]}}</p>
+            <p>Active Backlog : {{opportunity[5]}}</p>
+            <p>Student Year Requirement : {{opportunity[6]}}</p>
+            <p>Program requirement : {{opportunity[7]}}</p>
+            <p>Job Description : {{opportunity[8]}}</p>
+
+            <p>Round Details:</p>
+            
             <div class="table-responsive">
                 <table class="table table-striped custom-table">
                     <thead>
                         <tr>
-                            <th scope="col">Company</th>
-                            <th scope="col">Title</th>
-                            <th scope="col">Status</th>
+                            <th scope="col">Round Number</th>
+                            <th scope="col">Type</th>
+                            <th scope="col">Venue</th>
+                            <th scope="col">Start Time</th>
+                            <th scope="col">End Time</th>
                         </tr>
                     </thead>
                     <tbody>
-                        {% for application in applications %}
+                        {% for round in rounds %}
                         <tr>
-                            <td>{{ application[-1] }}</td>
-                            <td>{{ application[4] }}</td>
-                            <td>{{ application[-3] }}</td>
+                            <td>{{ round[0] }}</td>
+                            <td>{{ round[2] }}</td>
+                            <td>{{ round[3] }}</td>
+                            <td>{{ round[4] }}</td>
+                            <td>{{ round[5] }}</td>
                         </tr>
                         {% endfor %}
                     </tbody>
                 </table>
             </div>
-            {% else %}
-            <p>You have not applied for any opportunities applied at the moment.</p>
-            {% endif %}
         </div>
     </div>
     <script src="js/jquery-3.3.1.min.js"></script>
@@ -59,7 +71,5 @@
     <script src="js/bootstrap.min.js"></script>
     <script src="js/main.js"></script>
 </body>
-
-</html>
 
 </html>
