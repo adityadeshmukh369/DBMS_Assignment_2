@@ -50,6 +50,17 @@
             <label for="studentImage">Student Image:</label>
             <input type="file" value="{{user_profile[8]}}" id="studentImage" name="studentImage" class="input-box" accept="image/*">
 
+            <label for="CPI">CPI</label>
+            <input type="text" value="{{user_profile[12]}}" name="CPI" id="CPI" placeholder="Enter Your CPI"
+                class="input-box" required>
+
+            <label for="SSAC_or_not">SSAC_or_not:</label>
+            <select id="SSAC_or_not" name="SSAC_or_not" class="input-box" required>
+                <option value="">Select</option>
+                <option value="Yes" {% if user_profile[13]=='Yes' %}selected{% endif %}>Yes</option>
+                <option value="No" {% if user_profile[13]=='No' %}selected{% endif %}>No</option>
+            </select>
+
             <button type="submit" class="btn">{{footer}}</button>
         </form>
     </div>

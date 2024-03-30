@@ -150,7 +150,7 @@ def status_opp_student():
     student_id = cur.fetchone()[0]
     cur = mysql.connection.cursor()
 
-    cur.execute("SELECT A.*, O.Opp_Title FROM Application A JOIN Opportunity O ON A.Opp_ID = O.Opp_ID WHERE A.Student_ID = %s", (student_id,))
+    cur.execute("SELECT A.*, O.Opp_Title, O.Company FROM Application A JOIN Opportunity O ON A.Opp_ID = O.Opp_ID WHERE A.Student_ID = %s", (student_id,))
     applications = cur.fetchall()
     print(applications)
     cur.close()
@@ -198,6 +198,9 @@ def create_profile():
 
         # Handle student image upload
         studentImage = request.files.get('studentImage')
+        CPI = request.form.get('CPI')
+        SSAC_or_not = request.form.get('SSAC_or_not') 
+
         studentImagePath = None
         if studentImage:
             studentImageFilename = secure_filename(studentImage.filename)
@@ -212,8 +215,8 @@ def create_profile():
         if existing_user:
             # User already exists, update the profile
             student_id = existing_user[0]
-            query = "UPDATE Student SET Student_First_Name = %s, Student_Middle_Name = %s, Student_Last_Name = %s, Active_Backlog = %s, Department = %s, Gender = %s, Year = %s, Student_Image = %s, Minors = %s, Contact_Number = %s WHERE Student_ID = %s"
-            values = (firstName, middleName, lastName, activeBacklog, department, gender, currentYear, studentImagePath, minors, contactNumber, student_id)
+            query = "UPDATE Student SET Student_First_Name = %s, Student_Middle_Name = %s, Student_Last_Name = %s, Active_Backlog = %s, Department = %s, Gender = %s, Year = %s, Student_Image = %s, Minors = %s, Contact_Number = %s, CPI = %s, SSAC_or_not = %s WHERE Student_ID = %s"
+            values = (firstName, middleName, lastName, activeBacklog, department, gender, currentYear, studentImagePath, minors, contactNumber, CPI, SSAC_or_not, student_id)
             cur.execute(query, values)
             mysql.connection.commit()
             flash("Profile updated successfully!", "success")
@@ -222,8 +225,8 @@ def create_profile():
             cur.execute("SELECT MAX(Student_ID) FROM Student")
             last_student_id = cur.fetchone()[0]
             new_student_id = last_student_id + 1 if last_student_id else 1
-            query = "INSERT INTO Student (Student_ID, Student_First_Name, Student_Middle_Name, Student_Last_Name, Active_Backlog, Department, Gender, Year, Student_Image, Minors, Student_Email_Id, Contact_Number) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
-            values = (new_student_id, firstName, middleName, lastName, activeBacklog, department, gender, currentYear, studentImagePath, minors, email, contactNumber)
+            query = "INSERT INTO Student (Student_ID, Student_First_Name, Student_Middle_Name, Student_Last_Name, Active_Backlog, Department, Gender, Year, Student_Image, Minors, Student_Email_Id, Contact_Number, CPI, SSAC_or_not) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
+            values = (new_student_id, firstName, middleName, lastName, activeBacklog, department, gender, currentYear, studentImagePath, minors, email, contactNumber, CPI, SSAC_or_not)
             cur.execute(query, values)
             mysql.connection.commit()
             flash("Profile created successfully!", "success")
@@ -465,6 +468,7 @@ def save_opportunity():
 
     # Fetching form data from the request
     opp_title = request.form['Opp_Title']
+    Company = request.form['Company']
     no_of_positions = request.form['No_of_Positions']
     specific_requirements_file = request.files['Specific_Requirements_file']
     min_cpi_req = request.form['Min_CPI_req']
@@ -484,8 +488,8 @@ def save_opportunity():
 
     if existing_opp:  # If opportunity exists, update it
         opp_id = existing_opp[0]
-        query = "UPDATE Opportunity SET Opp_Title = %s, No_of_Positions = %s, Specific_Requirements_file = %s, Min_CPI_req = %s, No_Active_Backlogs = %s, Student_year_req = %s, Program_req = %s, Job_Description_file = %s, Posted_on = %s, Deadline = %s, Salary = %s, POC_Email = %s WHERE Opp_ID = %s"
-        values = (opp_title, no_of_positions, specific_requirements_file, min_cpi_req, no_active_backlogs, student_year_req, program_req, job_description_file, posted_on, deadline, salary, email, opp_id)
+        query = "UPDATE Opportunity SET Opp_Title = %s, No_of_Positions = %s, Specific_Requirements_file = %s, Min_CPI_req = %s, No_Active_Backlogs = %s, Student_year_req = %s, Program_req = %s, Job_Description_file = %s, Posted_on = %s, Deadline = %s, Salary = %s, POC_Email = %s, Company = %s, WHERE Opp_ID = %s"
+        values = (opp_title, no_of_positions, specific_requirements_file, min_cpi_req, no_active_backlogs, student_year_req, program_req, job_description_file, posted_on, deadline, salary, email, Company, opp_id)
     else:  # If opportunity doesn't exist, insert it
         cur.execute("SELECT MAX(Opp_ID) FROM Opportunity")
         opp_id = cur.fetchone()[0]
@@ -493,8 +497,8 @@ def save_opportunity():
             opp_id = 1
         else:
             opp_id = opp_id + 1
-        query = "INSERT INTO Opportunity (Opp_ID, Opp_Title, No_of_Positions, Specific_Requirements_file, Min_CPI_req, No_Active_Backlogs, Student_year_req, Program_req, Job_Description_file, Posted_on, Deadline, Salary, POC_Email) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
-        values = (opp_id, opp_title, no_of_positions, specific_requirements_file, min_cpi_req, no_active_backlogs, student_year_req, program_req, job_description_file, posted_on, deadline, salary, email)
+        query = "INSERT INTO Opportunity (Opp_ID, Opp_Title, No_of_Positions, Specific_Requirements_file, Min_CPI_req, No_Active_Backlogs, Student_year_req, Program_req, Job_Description_file, Posted_on, Deadline, Salary, POC_Email, Company) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
+        values = (opp_id, opp_title, no_of_positions, specific_requirements_file, min_cpi_req, no_active_backlogs, student_year_req, program_req, job_description_file, posted_on, deadline, salary, email, Company)
 
     # Execute the query and commit changes
     cur.execute(query, values)
