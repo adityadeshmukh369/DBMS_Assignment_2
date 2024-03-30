@@ -6,12 +6,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Create Opportunity</title>
     <link rel="stylesheet" href="/static/host_opportunity.css">
+
+    <script>
+        function displayPopup() {
+            alert("Opportunity hosted successfully!");
+        }
+    </script>
+
 </head>
 
 <body>
     <div class="box">
         <h2 class="h3box">{{title}}</h2>
-        <form method="POST" action="/save_opportunity" enctype="multipart/form-data">
+        <form method="POST" action="/save_opportunity" enctype="multipart/form-data" onsubmit="displayPopup()">
 
             <label for="oppTitle" class="label-box">Opportunity Title:</label>
             <input value="{{opportunity[1]}}" type="text" id="oppTitle" name="Opp_Title" placeholder="Enter opportunity title" class="input-box" required>
